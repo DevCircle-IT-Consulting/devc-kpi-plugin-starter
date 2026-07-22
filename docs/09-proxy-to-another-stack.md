@@ -1,10 +1,10 @@
 # 09 - Reporting on a database in another Docker stack (the proxy)
 
-Your source database often lives in **its own application stack** — a scout app, an ERP, a CRM, each
-with its own Postgres/SQL Server container — that the KPI engine can't (or shouldn't) reach directly.
-The **on-prem proxy** bridges that: a small container you run *on that stack's network* which dials
-**out** to your engine's relay and runs the engine's queries against the local DB. Nothing inbound is
-exposed on the DB side, and you point DevC.KPI at any number of such stacks the same way.
+Your source database often lives in **its own application stack** — an ERP, a CRM, a line-of-business
+app, each with its own Postgres/SQL Server container — that the KPI engine can't (or shouldn't) reach
+directly. The **on-prem proxy** bridges that: a small container you run *on that stack's network* which
+dials **out** to your engine's relay and runs the engine's queries against the local DB. Nothing inbound
+is exposed on the DB side, and you point DevC.KPI at any number of such stacks the same way.
 
 ```
 KPI engine  ⇜ relay (proxy dials out) ⇜  proxy container  ──▶  app-stack DB (same docker network)
@@ -15,7 +15,7 @@ KPI engine  ⇜ relay (proxy dials out) ⇜  proxy container  ──▶  app-sta
 The proxy holds **no** database config. The engine sends the **connection string** (from its secret
 store) down the relay with each query, and the proxy runs it. So the connection string must name the DB
 **as the proxy sees it** — i.e. the DB's container/service name on the network the proxy joins
-(`Host=scouts-db`), *not* a host the engine can reach.
+(`Host=app-db`), *not* a host the engine can reach.
 
 ## Engine side (once per source stack)
 
@@ -23,32 +23,32 @@ store) down the relay with each query, and the proxy runs it. So the connection 
    [server](../server) stack):
    ```yaml
    proxies:
-     - id: scouts-onprem1
-       name: "Scouts on-prem proxy"
-       secret: PROXY_SCOUTS_ONPREM1     # -> the key HASH, below
-       tenants: [scouts]
+     - id: acme-onprem1
+       name: "ACME on-prem proxy"
+       secret: PROXY_ACME_ONPREM1     # -> the key HASH, below
+       tenants: [acme]
    ```
 2. **Add the secrets** to the engine (server/secrets, `Reporting:Secrets`):
    ```json
    {
      "Reporting": { "Secrets": {
-       "PROXY_SCOUTS_ONPREM1": "<sha256-hex-of-the-proxy-key>",
-       "SCOUTS_DB": "Server=scouts-db;Port=5432;Database=scouts;Username=reporting;Password=...;"
+       "PROXY_ACME_ONPREM1": "<sha256-hex-of-the-proxy-key>",
+       "APP_DB": "Server=app-db;Port=5432;Database=app;Username=reporting;Password=...;"
      } }
    }
    ```
-   `SCOUTS_DB`'s `Server=scouts-db` is the DB container's name on the proxy's network (see the model
-   above). `PROXY_SCOUTS_ONPREM1` is the **hash** of the proxy key.
+   `APP_DB`'s `Server=app-db` is the DB container's name on the proxy's network (see the model above).
+   `PROXY_ACME_ONPREM1` is the **hash** of the proxy key.
 3. **Generate the key + hash**: create a random key, give the plaintext to the proxy (`PROXY_KEY`) and
-   the SHA-256 hash to the engine (`PROXY_SCOUTS_ONPREM1`). The ProxyProbe `keygen` helper produces a
+   the SHA-256 hash to the engine (`PROXY_ACME_ONPREM1`). The ProxyProbe `keygen` helper produces a
    pair; if unsure, ask DevCircle.
 4. **The datasource** (in your plugin's `config/<tenant>/datasources/`) routes through the proxy:
    ```yaml
-   id: scouts
-   builder: ScoutCube
+   id: app
+   builder: AppCube
    type: postgres          # or mssql
-   proxy: scouts-onprem1   # the id from proxies.yaml
-   secret: SCOUTS_DB
+   proxy: acme-onprem1     # the id from proxies.yaml
+   secret: APP_DB
    ```
 
 ## Proxy side (next to the DB)

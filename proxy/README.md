@@ -9,8 +9,8 @@ nothing inbound is exposed on the DB side.
 your KPI engine  ⇜ relay (outbound) ⇜  proxy container  ──▶  app-stack DB (same docker network)
 ```
 
-This is the clean way to point DevC.KPI at any containerized application stack (the scout DB, an ERP, …)
-without joining networks to the engine or exposing the DB.
+This is the clean way to point DevC.KPI at any containerized application stack (an ERP, a CRM, a
+line-of-business app, …) without joining networks to the engine or exposing the DB.
 
 ## Use it
 
