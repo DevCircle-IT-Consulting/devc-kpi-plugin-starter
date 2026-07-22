@@ -1,0 +1,14 @@
+## .NET build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+
+## dotnet new template test artifacts / local scratch
+dist/
+.vs/
+
+## IDE
+.idea/
+*.suo

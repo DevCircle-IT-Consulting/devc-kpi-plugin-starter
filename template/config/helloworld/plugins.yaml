@@ -1,0 +1,11 @@
+# plugins.yaml - which SHARED plugins this tenant opts into.
+#
+# You only need this for plugins whose Scope is `Shared`. This starter's plugin is
+# `ForTenants("helloworld")`, so it auto-binds for this tenant and needs no entry here -
+# the file is kept as a reference and is a harmless no-op with an empty list.
+#
+# If you convert the plugin to `Shared` (a cross-customer feature), list its Id here:
+#
+# enabled:
+#   - HelloWorld
+enabled: []

@@ -1,0 +1,8 @@
+# groups.yaml - sections + order for the report list / nav drawer (presentational only).
+# Grouping never grants access (that is per-user rights). Reports not listed fall into a trailing
+# "more reports" section. Remove this file and everything still works, ungrouped.
+groups:
+  - id: start
+    title: "Hello World"
+    reports:
+      - hello

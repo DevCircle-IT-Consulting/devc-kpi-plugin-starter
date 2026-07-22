@@ -1,0 +1,92 @@
+// ============================================================================================
+// REFERENCE ONLY - this file is *.cs.txt so it does NOT compile.
+//
+// It shows the full "widget with data" pattern: a fact row, a cube (DataSourceBuilder), a
+// conformed dimension, and a data-bound chart widget. To use it:
+//   1. Split these types into real .cs files (SalesRow.cs, SalesCube.cs, DateDimension.cs,
+//      RevenueByMonthChart.cs) - the None<->Compile switch in the .csproj keeps .cs.txt out.
+//   2. Register them in HelloWorldPlugin.Register (see the commented block there).
+//   3. Add a datasource YAML (config/.../datasources/sales.yaml) whose `builder:` == SalesCube.Key
+//      and reference the widget from a report page.
+// Full explanation: ../../docs/01-plugin-anatomy.md and ../../docs/04-widgets-and-charts.md.
+// ============================================================================================
+
+namespace DevC.KPI.Plugins.HelloWorld
+{
+    using System.Globalization;
+    using dasz.LinqCube;                       // Query<T>
+    using DevC.KPI.Reporting.Cubes;            // CubeResult / QueryResult navigation
+    using DevC.KPI.Reporting.Dimensions;       // Dim.*
+    using DevC.KPI.Reporting.ECharts;          // EChart.*
+    using DevC.KPI.Reporting.Measures;         // Measure.*
+    using DevC.KPI.Reporting.Plugins;          // DataSourceBuilder / Widget / ...
+
+    // ---- 1. The fact row: one record as your projection returns it ----------------------------
+    public sealed class SalesRow
+    {
+        public System.DateTime OrderDate { get; init; }
+        public string Team { get; init; } = "";
+        public decimal Amount { get; init; }
+    }
+
+    // ---- 2. A conformed dimension (plugin-owned wrapper over Dim.*) ----------------------------
+    public sealed class DateDimension
+    {
+        public const string Name = "Date";
+        public int FromYear { get; init; } = 2015;
+        public int ToYear { get; init; } = System.DateTime.Today.Year;
+
+        public Dimension<System.DateTime, TFact> For<TFact>(System.Func<TFact, System.DateTime> selector)
+            => Dim.YearMonth(Name, selector, FromYear, ToYear);
+    }
+
+    // ---- 3. The cube: fetch facts once, define named query results -----------------------------
+    public sealed class SalesCube : DataSourceBuilder<SalesRow>
+    {
+        public const string RevenueByMonth = "revenueByMonth";
+
+        public override string Key => "SalesCube";                              // == datasource YAML `builder:`
+        public override System.Collections.Generic.IReadOnlyCollection<string> ResultNames { get; }
+            = [RevenueByMonth];
+
+        // Fetch facts. For a DB datasource: ctx.Sql<SalesRow>(sql, new { from = ctx.LoadWindow.From, ... }).
+        // Return the sequence LAZILY - never .ToList() a large LoadFacts result.
+        protected override System.Collections.Generic.IEnumerable<SalesRow> LoadFacts(BuildContext ctx)
+        {
+            // Demo data; swap for ctx.Sql<SalesRow>("select ...") against your datasource.
+            yield return new SalesRow { OrderDate = new System.DateTime(2024, 1, 15), Team = "North", Amount = 1200m };
+            yield return new SalesRow { OrderDate = new System.DateTime(2024, 2, 10), Team = "South", Amount =  900m };
+        }
+
+        protected override System.Collections.Generic.IEnumerable<Query<SalesRow>> DefineQueries(BuildContext ctx)
+        {
+            var date = new DateDimension();
+            var revenue = Measure.Sum<SalesRow>("Revenue", r => r.Amount);
+            yield return new Query<SalesRow>(RevenueByMonth)
+                .WithChainedDimension(date.For<SalesRow>(r => r.OrderDate))
+                .WithMeasure(revenue);
+        }
+    }
+
+    // ---- 4. A data-bound widget: renders a chart from the cube's result ------------------------
+    public sealed class RevenueByMonthChart : Widget
+    {
+        public override string Title => "Revenue per month";
+        public override string Key => "RevenueByMonthChart";                    // report YAML `widget:`
+        public override string DataSourceId => "sales";                         // datasource YAML `id:` (NOT the cube Key)
+        public override string ResultName => SalesCube.RevenueByMonth;          // one of the cube's ResultNames
+        public override DateAxisMode DateAxis => DateAxisMode.UntilToday;       // normal time series
+
+        public override WidgetOutput Render(QueryResult result, WidgetContext context)
+        {
+            var months = result.Dimension("Date").Leaves()
+                .WithinAnyDateRange(context.DateFilter)                         // follow the report's date picker
+                .ToList();
+            var labels = months.Select(l => l.GetDateTimeEntry()!.Min.ToString("yyyy-MM", CultureInfo.InvariantCulture));
+            var values = months.Select(l => (double)l.Measure("Revenue"));
+            var option = EChart.Line().Category(labels).Series("Revenue", values).Tooltip().Build()
+                .Merge(context.RawOverrides);                                   // honor per-placement echarts: overrides - always last
+            return WidgetOutput.Chart(option);
+        }
+    }
+}

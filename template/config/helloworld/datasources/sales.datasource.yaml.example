@@ -1,0 +1,46 @@
+# =====================================================================================
+# REFERENCE datasource - the `.example` suffix means the engine does NOT load it.
+# Rename to `sales.yaml` (drop `.datasource` + `.example`) once you add a real cube.
+#
+# ONE datasource == ONE cube (IDataSourceBuilder) == ONE LinqCube. The YAML carries NO
+# SQL and NO credentials - it only names the builder, the source type, freshness and the
+# build-time load window. Secrets live in the server-owned secrets/ dir; on-prem DBs are
+# reached through a proxy (see below and ../../docs/03-datasources-and-secrets.md).
+# =====================================================================================
+
+id: sales                   # the id a widget's DataSourceId points at, and a report page lists
+builder: SalesCube          # plugin Key of the IDataSourceBuilder class (Reference/DataExample.cs.txt)
+
+# --- Source type -----------------------------------------------------------------------
+# postgres | mssql : a provider-backed DB. The engine opens the connection; your cube's
+#                    LoadFacts uses ctx.Sql<T>("select ...") and never sees credentials.
+# custom           : your builder fetches its own rows (a REST API, a computation, sample
+#                    data). No connection is opened for you.
+# text             : line-oriented files (logs, CSV); read via ctx.Lines().
+type: custom
+
+# --- Freshness: how often the cube rebuilds -------------------------------------------
+# custom defaults to `live` (rebuild on every widget request). Cache + refresh on a
+# schedule for anything non-trivial, so a page load does not re-run the aggregation.
+freshness:
+  mode: cached
+  refresh: "0 3 * * *"      # cron - rebuild daily at 03:00
+
+# --- Load window: how much history to LOAD at build time ------------------------------
+loadWindow:
+  from: "-3Y"               # relative (-3Y / -18M / -90D) or an ISO date
+  to: "now"
+
+# --- Params: free-form inputs your builder reads via BuildContext.Params ---------------
+# For a DB source this is typically the schema; for a REST source, the endpoint/params.
+params:
+  schema: public
+
+# --- On-prem / customer DB behind a proxy (postgres|mssql) -----------------------------
+# When the database is not reachable from the engine host, install the DevC.KPI proxy next
+# to the DB and point the datasource at it. Then add:
+#
+# proxy: my-proxy-id         # references an entry in the server-owned config/proxies.yaml
+# secret: sales-db           # references secrets/sales-db.json (connection string), filled per install
+#
+# proxies.yaml and secrets/ are SERVER-owned (never in this repo). See the docs.

@@ -1,0 +1,20 @@
+# reports/sales.yaml - the example report.
+# ONE global filter: the date-hierarchy picker bound to the Date dimension. Every widget on the
+# page re-slices live when a period is (un)checked.
+id: sales
+title: "Sales demo"
+filters:
+  - id: periods
+    type: datetree
+    bindsTo: Date
+
+pages:
+  - id: overview
+    title: "Overview"
+    datasources: [sales]        # the datasource ids this page's data-bound widgets read
+    layout:
+      cols: 12
+    widgets:
+      - { widget: RevenueKpi,           pos: { x: 0, y: 0, w: 3,  h: 2 } }
+      - { widget: RevenueByMonthChart,  pos: { x: 3, y: 0, w: 9,  h: 4 } }
+      - { widget: RevenueByTeamTable,   pos: { x: 0, y: 4, w: 6,  h: 4 } }

@@ -1,0 +1,54 @@
+// ============================================================================================
+// REFERENCE ONLY - *.cs.txt, does NOT compile. The unit-test recipe for a DATA-bound cube.
+//
+// It mirrors how the real DevC.KPI plugins test their cubes: feed sample fact rows through the
+// SDK's public InMemoryBuildDataAccess, build the cube, then assert the measures at dimension
+// nodes. No database, no engine - pure, fast unit tests you can run with `dotnet test`.
+//
+// Pair it with Reference/DataExample.cs.txt in the plugin project (the SalesRow / SalesCube it uses).
+// ============================================================================================
+
+namespace DevC.KPI.Plugins.HelloWorld.Tests
+{
+    using System;
+    using System.Collections.Generic;
+    using DevC.KPI.Reporting.Cubes;      // CubeResult / QueryResult
+    using DevC.KPI.Reporting.Plugins;    // BuildContext / InMemoryBuildDataAccess / DateRange
+    using Xunit;
+
+    public class SalesCubeTests
+    {
+        // Sample facts - the "given" of the test. Shape them to exercise the edge cases you care about.
+        private static readonly SalesRow[] Rows =
+        [
+            new() { OrderDate = new DateTime(2024, 1, 15), Team = "North", Amount = 1000m },
+            new() { OrderDate = new DateTime(2024, 1, 20), Team = "South", Amount =  500m },
+            new() { OrderDate = new DateTime(2024, 2, 10), Team = "North", Amount =  200m },
+        ];
+
+        // Build the cube against in-memory rows. InMemoryBuildDataAccess ignores the SQL your
+        // LoadFacts passes and returns the seeded rows by type - so LoadFacts' projection is exercised
+        // without a database. .Add(...) can be called multiple times for multiple fact/domain types.
+        private static CubeResult BuildCube()
+        {
+            var context = new BuildContext
+            {
+                DataSourceId = "sales",
+                Params = new Dictionary<string, string>(),
+                LoadWindow = new DateRange(DateTime.MinValue, DateTime.MaxValue),
+                Data = new InMemoryBuildDataAccess().Add(Rows),
+            };
+            return new SalesCube().Build(context);
+        }
+
+        [Fact]
+        public void RevenueByMonth_SumsPerMonth()
+        {
+            var months = BuildCube().Query(SalesCube.RevenueByMonth).Dimension("Date").Leaves();
+
+            // January = 1000 + 500 = 1500; read a measure at a node with .Measure("<name>").
+            var january = System.Linq.Enumerable.First(months, m => m.GetDateTimeEntry()!.Min.Month == 1);
+            Assert.Equal(1500m, january.Measure("Revenue"));
+        }
+    }
+}

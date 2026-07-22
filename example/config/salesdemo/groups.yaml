@@ -1,0 +1,5 @@
+groups:
+  - id: examples
+    title: "Examples"
+    reports:
+      - sales

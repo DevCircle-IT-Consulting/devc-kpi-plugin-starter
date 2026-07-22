@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The rich reference plugin. Same single dependency as any plugin: the public SDK.
+       Unlike the template starter, this one shows the full data path: a cube with sample data,
+       conformed dimensions, three widget output kinds (chart / KPI value / table), a date filter,
+       and a unit-test project. Read it to learn; start new plugins from ../template. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DevC.KPI.Reporting.Sdk" Version="1.3.1" />
+  </ItemGroup>
+
+</Project>

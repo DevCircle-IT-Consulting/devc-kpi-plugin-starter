@@ -1,0 +1,13 @@
+# datasources/sales.yaml - the one (active) datasource for the example.
+# It binds to SalesCube (a `custom` builder that owns its sample rows), so it needs no DB,
+# no proxy and no secret - it just works. See ../../docs/03-datasources-and-secrets.md for the
+# postgres / mssql / proxy / secret variants.
+id: sales
+builder: SalesCube          # plugin Key of the IDataSourceBuilder
+type: custom                # the builder produces its own rows (sample data)
+freshness:
+  mode: cached
+  refresh: "0 3 * * *"      # rebuild daily at 03:00
+loadWindow:
+  from: "-3Y"
+  to: "now"

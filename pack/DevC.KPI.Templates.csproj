@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Packs the ../template starter into a distributable `dotnet new` template package.
+
+      dotnet pack pack/DevC.KPI.Templates.csproj -o dist
+      dotnet new install dist/DevC.KPI.Templates.1.0.0.nupkg
+      dotnet new devckpi-plugin -n Acme
+
+    You do NOT need this to use the template locally - `dotnet new install ./template` works
+    straight from the folder. This project just produces a shareable nupkg (e.g. to publish on
+    a feed) so others can install by package id.
+  -->
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <PackageId>DevC.KPI.Templates</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Title>DevC.KPI reporting plugin templates</Title>
+    <Description>`dotnet new` templates for DevC.KPI reporting plugins (hello-world starter).</Description>
+    <Authors>DevCircle IT Consulting GmbH</Authors>
+    <PackageTags>dotnet-new;templates;devc;kpi;plugin</PackageTags>
+
+    <TargetFramework>net10.0</TargetFramework>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The template content = the whole ../template folder, minus build output. -->
+    <Content Include="..\template\**\*" Exclude="..\template\**\bin\**;..\template\**\obj\**" />
+  </ItemGroup>
+
+</Project>

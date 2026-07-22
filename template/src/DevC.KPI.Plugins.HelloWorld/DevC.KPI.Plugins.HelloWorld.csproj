@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    A DevC.KPI reporting plugin.
+
+    * It is a plain net10.0 class library.
+    * It compiles against ONE package: the public DevC.KPI.Reporting.Sdk (nuget.org).
+      That package brings in everything a plugin needs (LinqCube, the widget/cube/
+      dimension/chart contracts) transitively - you never reference the engine.
+    * The compiled DLL is dropped into the engine's plugins volume at runtime; the
+      licensed engine image loads it. You never run the engine from this repo.
+
+    See ../docs/01-plugin-anatomy.md for the full walkthrough.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The only reference a plugin needs. Bump to the latest published SDK when you
+         want newer contracts; older plugins keep working against their pinned version. -->
+    <PackageReference Include="DevC.KPI.Reporting.Sdk" Version="1.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reference-only files: example cube/data code kept as *.cs.txt so it does NOT
+         compile. Copy the snippets into real .cs files when you add data (see below). -->
+    <None Include="Reference\**\*" />
+  </ItemGroup>
+
+</Project>

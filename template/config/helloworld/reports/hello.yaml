@@ -1,0 +1,28 @@
+# reports/hello.yaml - the one report this starter ships.
+#
+# A report is a thin manifest: id + title + pages, each page places widgets on a grid.
+# Cubes, dimensions and rendering live in code; YAML only wires + positions things.
+id: hello
+title: "Hello World"
+
+# No `filters:` here - the Hello-World widget is static (no data, no date axis). When you add a
+# data-bound widget, declare the date hierarchy picker at the report root so every page shares it:
+#
+# filters:
+#   - id: periods
+#     type: datetree        # year / quarter / month checkboxes; the standard DevC.KPI date filter
+#     bindsTo: Date         # the conformed dimension name the cube slices by
+
+pages:
+  - id: start
+    title: "Start"
+    # `datasources:` lists the datasource ids a page's data-bound widgets read. The static
+    # Hello-World widget needs none, so this page declares none. Add e.g. `datasources: [sales]`
+    # when you place a data-bound widget.
+    layout:
+      cols: 12                       # a 12-column grid; widget pos/size are in grid cells
+    widgets:
+      - { widget: HelloWorld, pos: { x: 0, y: 0, w: 12, h: 4 } }
+
+      # More widgets go here, e.g. once you add the data example:
+      # - { widget: RevenueByMonthChart, pos: { x: 0, y: 4, w: 8, h: 4 } }

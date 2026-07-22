@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DevC.KPI.Plugins.HelloWorld/DevC.KPI.Plugins.HelloWorld.csproj" />
+    <Project Path="src/DevC.KPI.Plugins.HelloWorld.Tests/DevC.KPI.Plugins.HelloWorld.Tests.csproj" />
+  </Folder>
+</Solution>

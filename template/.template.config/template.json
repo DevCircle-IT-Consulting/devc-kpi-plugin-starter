@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "DevCircle IT Consulting GmbH",
+  "classifications": [ "DevC.KPI", "Plugin", "Reporting" ],
+  "identity": "DevC.KPI.ReportingPlugin.Starter",
+  "name": "DevC.KPI reporting plugin",
+  "description": "A starter DevC.KPI reporting plugin repo: one static hello-world widget, a unit-test project, a commented cube/datasource reference, and a deploy bundle script.",
+  "shortName": "devckpi-plugin",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "HelloWorld",
+  "preferNameDirectory": true,
+  "symbols": {
+    "tenant": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "",
+      "description": "The engine tenant name this plugin targets: the config/<tenant>/ folder and PluginScope.ForTenants(...). It must EQUAL the tenant name provisioned in the engine (there is no mapping table). If omitted, the lowercased project name is used."
+    },
+    "tenantLower": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "lowerCase"
+    },
+    "tenantValue": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "tenant",
+        "fallbackVariableName": "tenantLower"
+      },
+      "replaces": "helloworld",
+      "fileRename": "helloworld"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "exclude": [
+            "**/bin/**",
+            "**/obj/**",
+            "**/.vs/**",
+            "**/.template.config/**"
+          ]
+        }
+      ]
+    }
+  ],
+  "primaryOutputs": [
+    { "path": "src/DevC.KPI.Plugins.HelloWorld/DevC.KPI.Plugins.HelloWorld.csproj" }
+  ]
+}

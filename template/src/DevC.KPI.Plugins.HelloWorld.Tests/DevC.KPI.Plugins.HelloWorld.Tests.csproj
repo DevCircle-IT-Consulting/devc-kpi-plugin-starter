@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Unit tests for the plugin. The SDK (with its public test kit - InMemoryBuildDataAccess /
+       EmptyBuildDataAccess) comes transitively through the plugin project reference, so tests need
+       no extra package beyond the test runner. `dotnet test` at the repo root runs this. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DevC.KPI.Plugins.HelloWorld\DevC.KPI.Plugins.HelloWorld.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reference-only cube-test recipe (kept as *.cs.txt so it does not compile). -->
+    <None Include="Reference\**\*" />
+  </ItemGroup>
+
+</Project>
