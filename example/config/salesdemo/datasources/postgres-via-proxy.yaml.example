@@ -1,0 +1,15 @@
+# REFERENCE (.example = not loaded). PostgreSQL that is NOT reachable from the engine host —
+# reached through an on-prem DevC.KPI proxy installed next to the database. Add `proxy:` naming a
+# proxy id from the server-owned proxies.yaml (see ../../proxies.example.yaml). The proxy's key hash
+# and the DB connection string both live in secrets (referenced by name), never here.
+id: orders
+builder: OrderCube
+type: postgres
+proxy: acme-onprem1          # an entry id in the server-owned config/proxies.yaml
+secret: ORDERS_DB            # -> Reporting:Secrets:ORDERS_DB (connection string, as the proxy sees the DB)
+freshness:
+  mode: cached
+  refresh: "0 3 * * *"
+loadWindow:
+  from: "-3Y"
+  to: "now"

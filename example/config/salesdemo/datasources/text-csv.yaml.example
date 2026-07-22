@@ -1,0 +1,14 @@
+# REFERENCE (.example = not loaded). A `type: text` datasource over a CSV file — a CSV is just text,
+# so parse the lines in your builder (split on the delimiter, skip the header). Point `params.path` at
+# one file or a glob for a rolling set of exports.
+id: exports
+builder: CsvExportCube
+type: text
+params:
+  path: '/srv/kpi/data/exports/*.csv'
+freshness:
+  mode: cached
+  refresh: "0 4 * * *"
+loadWindow:
+  from: "-1Y"
+  to: "now"

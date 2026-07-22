@@ -1,0 +1,29 @@
+DevC.KPI Plugin Starter Kit — Licence
+
+Copyright (c) DevCircle IT Consulting GmbH. All rights reserved.
+
+This repository (the "Starter Kit") comprises example plugins, a project
+template, documentation, and helper scripts for authoring reporting plugins for
+DevC.KPI. It is proprietary material of DevCircle IT Consulting GmbH. It is not
+open-source software and is not licensed under any GPL, MIT, Apache, or other
+open-source licence.
+
+Grant of use. Subject to this licence, DevCircle IT Consulting GmbH grants you a
+non-exclusive, non-transferable, revocable right to use, copy, and adapt the
+contents of the Starter Kit solely to develop your own reporting plugins intended
+to run on a licensed DevC.KPI installation. Plugins you create from it are yours.
+
+Restrictions. Except as expressly permitted above, you may not redistribute,
+publish, sublicense, sell, or rent the Starter Kit itself or substantial portions
+of it, nor present it as your own. No rights are granted to the DevC.KPI engine,
+the DevC.KPI.Reporting.Sdk, or any other DevCircle software, which are licensed
+separately.
+
+No warranty. THE STARTER KIT IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. TO THE MAXIMUM EXTENT
+PERMITTED BY LAW, DEVCIRCLE IT CONSULTING GMBH SHALL NOT BE LIABLE FOR ANY CLAIM,
+DAMAGES, OR OTHER LIABILITY ARISING FROM OR IN CONNECTION WITH THE STARTER KIT OR
+ITS USE.
+
+For licensing enquiries, contact DevCircle IT Consulting GmbH — https://devcircle.at

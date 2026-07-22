@@ -1,0 +1,18 @@
+# =====================================================================================
+# REFERENCE ONLY — proxies.yaml is SERVER-OWNED. On a real install it lives at
+# /srv/kpi/config/proxies.yaml and is maintained by hand (like .env / secrets/). It is
+# NOT part of a plugin repo and is never deployed from one. This copy exists only so you
+# can see what a datasource's `proxy: <id>` points at.
+#
+# A proxy is the on-prem DevC.KPI process installed next to a customer database that the
+# engine host cannot reach directly. Each entry's API-key HASH lives in the secret store
+# (referenced by `secret:`), never here; the plaintext key stays on the proxy host.
+# =====================================================================================
+proxies:
+  - id: acme-onprem1
+    name: "ACME on-prem proxy"
+    notes: >
+      Reaches ACME's internal databases (Postgres / SQL Server) through the on-prem proxy,
+      typically over an SSH tunnel. Only the port in the DB connection string changes per install.
+    secret: PROXY_ACME_ONPREM1        # -> Reporting:Secrets:PROXY_ACME_ONPREM1 = sha256 hash of the proxy key
+    tenants: [salesdemo]              # which tenants may route through it; or `tenants: all`

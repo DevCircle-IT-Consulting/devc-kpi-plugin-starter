@@ -1,0 +1,12 @@
+# REFERENCE (.example = not loaded). A `custom` datasource with IN-PROCESS data — a computation, a
+# fixture, or bundled sample rows. This is exactly what the ACTIVE `sales.yaml` in this folder uses.
+# No secret, no proxy, no database.
+id: sample
+builder: SampleCube          # its LoadFacts returns rows directly (no context.Sql / no DB)
+type: custom
+freshness:
+  mode: cached
+  refresh: "0 3 * * *"
+loadWindow:
+  from: "-3Y"
+  to: "now"

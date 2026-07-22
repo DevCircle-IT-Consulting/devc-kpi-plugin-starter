@@ -1,0 +1,14 @@
+# REFERENCE (.example = not loaded). A `type: text` datasource over line-oriented files — here rotated,
+# partly-gzipped logs. Your builder reads lines via context.Lines(); no DB, no secret. `params.path` is
+# a glob; `.gz` files are read transparently.
+id: access-log
+builder: AccessLogCube
+type: text
+params:
+  path: '/var/log/myapp/access.log*'    # access.log + access.log.1 + access.log.2.gz + …
+freshness:
+  mode: cached
+  refresh: "0 * * * *"     # hourly — the log grows continuously
+loadWindow:
+  from: "-30d"
+  to: "now"

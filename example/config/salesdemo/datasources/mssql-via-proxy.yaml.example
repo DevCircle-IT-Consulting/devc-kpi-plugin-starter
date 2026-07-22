@@ -1,0 +1,17 @@
+# REFERENCE (.example = not loaded). Microsoft SQL Server source. Shown via a proxy (drop the
+# `proxy:` line if the server can reach the DB directly, exactly like postgres-direct). The connection
+# string is a SqlClient one (see ../../secrets/salesdemo.example.json).
+id: erp
+builder: ErpCube
+type: mssql
+proxy: acme-onprem1          # omit for a directly-reachable SQL Server
+secret: ERP_DB               # -> Reporting:Secrets:ERP_DB (a Microsoft.Data.SqlClient connection string)
+freshness:
+  mode: cached
+  refresh: "0 5 * * *"
+loadWindow:
+  from: "-1Y"
+  to: "now"
+params:
+  # Any builder-specific inputs you read via BuildContext.Params (schema/view names, flags, …).
+  viewSuffix: ""

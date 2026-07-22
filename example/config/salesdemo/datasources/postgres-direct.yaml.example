@@ -1,0 +1,18 @@
+# =====================================================================================
+# REFERENCE — the `.example` suffix means the engine does NOT load this file. Copy it to
+# `<id>.yaml` and adapt when you add a real cube. One datasource = one cube (builder).
+#
+# PostgreSQL reached DIRECTLY from the engine host (no proxy). The connection string is
+# NEVER inline here — it lives in the server-owned secrets file, referenced by name
+# (`secret:`). See ../../secrets/salesdemo.example.json for the matching entry.
+# =====================================================================================
+id: customers
+builder: CustomerCube        # the Key of your DataSourceBuilder
+type: postgres               # postgres | mssql | custom | text
+secret: CUSTOMERS_DB         # -> Reporting:Secrets:CUSTOMERS_DB (a Npgsql connection string)
+freshness:
+  mode: cached               # cached (rebuild on a schedule) | live (rebuild every request)
+  refresh: "0 3 * * *"       # cron — rebuild daily at 03:00
+loadWindow:
+  from: "-3Y"                # how much history to load at build time (relative or ISO date)
+  to: "now"

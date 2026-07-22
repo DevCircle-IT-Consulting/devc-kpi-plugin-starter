@@ -24,8 +24,11 @@ example/
 │       └── SalesCubeTests.cs                      # builds the cube, asserts aggregates
 ├── config/salesdemo/
 │   ├── datasources/sales.yaml                     # active: builder SalesCube, type custom
+│   ├── datasources/*.yaml.example                 # cookbook: postgres/mssql/custom/text, direct & via-proxy
 │   ├── reports/sales.yaml                         # datetree filter + a page with all 3 widgets
 │   ├── groups.yaml / plugins.yaml
+├── config/proxies.example.yaml                    # what `proxy:` points at (server-owned; reference)
+├── secrets/salesdemo.example.json                 # matching connection strings (placeholder creds)
 └── deploy/build-bundle.sh
 ```
 

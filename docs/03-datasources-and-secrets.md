@@ -70,7 +70,23 @@ secret: sales-db
 maintained by hand like `.env`/`secrets/`. It is not part of your plugin repo. As a plugin author you
 just name the proxy your datasource expects and DevCircle wires the actual proxy.
 
-## Reference
+## Cookbook — a commented example for every possibility
 
-See the commented `template/.../config/helloworld/datasources/sales.datasource.yaml.example` for a
-fully annotated datasource with the postgres/custom/text and proxy/secret variants side by side.
+`example/config/salesdemo/datasources/` carries a `*.yaml.example` file for each datasource kind
+(the `.example` suffix means the engine does not load them — copy one to `<id>.yaml` and adapt):
+
+| File | Covers |
+|------|--------|
+| `postgres-direct.yaml.example`   | PostgreSQL reachable directly from the engine host (`secret:` only) |
+| `postgres-via-proxy.yaml.example`| PostgreSQL on-prem, via `proxy:` + `secret:` |
+| `mssql-via-proxy.yaml.example`   | Microsoft SQL Server (direct or via proxy) |
+| `custom-restapi.yaml.example`    | `custom` builder fetching from a REST API (+ optional API-key secret) |
+| `custom-inprocess.yaml.example`  | `custom` builder with in-process/sample data (no DB) |
+| `text-logs.yaml.example`         | `type: text` over rotated/gzipped log files |
+| `text-csv.yaml.example`          | `type: text` over CSV file(s) |
+
+Alongside them:
+- `example/config/proxies.example.yaml` — what a `proxy: <id>` points at (server-owned; reference only).
+- `example/secrets/salesdemo.example.json` — the matching secret entries (connection strings + proxy
+  key-hash), with **obvious placeholder** usernames/passwords to replace. Secrets are server-owned and
+  never committed with real values.
