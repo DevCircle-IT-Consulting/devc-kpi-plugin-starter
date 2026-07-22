@@ -36,6 +36,7 @@ See it live at **[kpi.devcircle.at](https://kpi.devcircle.at/)**, or read the
 | [`example/`](example) | The **worked example** - a real cube with sample data, a line chart, a KPI tile, a table, a date filter, and unit tests. Read it to learn. |
 | [`docs/`](docs) | The authoring guide (getting started, plugin anatomy, config, datasources, widgets/charts, deploy, exploring your data, working with Claude). |
 | [`tools/`](tools) | `kpi-probe.sh` - a convenience wrapper around the ProxyProbe DB-explorer CLI. |
+| [`server/`](server) | Run the engine on one box (Docker Compose + templates) — for evaluation / plugin dev. See [docs/08](docs/08-run-the-server.md). |
 | [`pack/`](pack) | Packs the template into a distributable `dotnet new` nupkg (optional). |
 
 A Claude Code skill (`authoring-kpi-plugin`) that knows the SDK surface is **not vendored here** - it
@@ -43,6 +44,10 @@ ships inside the `DevC.KPI.Reporting.Sdk` NuGet package (single source of truth)
 see [docs/06](docs/06-working-with-claude.md).
 
 ## Quick start
+
+**Run the engine** (needed to see any report live) — stand up the server on one box with the
+[`server/`](server) stack; steps in [docs/08-run-the-server.md](docs/08-run-the-server.md). The engine
+images are licence-gated, so DevCircle provides the registry credential + image tag.
 
 **Look at the example** (needs the .NET 10 SDK; the DevC SDK restores from nuget.org):
 

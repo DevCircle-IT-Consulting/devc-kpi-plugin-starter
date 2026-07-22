@@ -1,0 +1,76 @@
+# DevC.KPI — one-box evaluation stack (Postgres + API + client + a TLS reverse proxy).
+#
+# This runs the whole server on a single machine for evaluation / plugin development. A REAL
+# deployment terminates TLS at your own reverse proxy (or is set up with DevCircle) and runs the
+# containers as a non-root user — see docs/08-run-the-server.md. The engine images are licence-gated:
+# DevCircle gives you the registry host, a pull credential, and the tag to run.
+#
+# For simplicity this stack runs the app containers as root (no uid mapping) and uses a self-signed
+# cert for localhost. Do not use it as-is for a public deployment.
+
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - kpi-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  api:
+    image: ${KPI_IMAGE}/api:${KPI_IMAGE_TAG}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080          # http inside the container; nginx terminates TLS
+      HOME: /srv/kpi/api/home                 # OpenIddict dev certs + DataProtection keys persist here
+      ConnectionStrings__DefaultConnection: "Server=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Include Error Detail=false;"
+      Reporting__ConfigPath: /srv/kpi/config
+      SECRETS__PATH: /srv/kpi/secrets
+    volumes:
+      - ./api/appsettings.Production.json:/app/appsettings.Production.json:ro
+      - ./config:/srv/kpi/config:ro     # your tenant config (empty is fine — the demo is baked into the image)
+      - ./plugins:/srv/kpi/plugins:ro   # drop your plugin bundle here, then `docker compose restart api`
+      - ./secrets:/srv/kpi/secrets:ro   # connection strings etc. (empty is fine for the demo)
+      - kpi-api-home:/srv/kpi/api/home
+
+  client:
+    image: ${KPI_IMAGE}/client:${KPI_IMAGE_TAG}
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      HOME: /srv/kpi/client/home
+    volumes:
+      - ./client/appsettings.Production.json:/app/appsettings.Production.json:ro
+      - kpi-client-home:/srv/kpi/client/home
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+      - client
+    ports:
+      - "8443:8443"                       # browse https://localhost:8443
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro       # localhost.crt + localhost.key (you generate these — see docs)
+
+volumes:
+  kpi-pgdata:
+  kpi-api-home:
+  kpi-client-home:

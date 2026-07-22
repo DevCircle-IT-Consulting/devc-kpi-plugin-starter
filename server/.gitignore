@@ -1,0 +1,12 @@
+# Local, secret, or generated — never commit these.
+.env
+api/appsettings.Production.json
+client/appsettings.Production.json
+certs/*.crt
+certs/*.key
+
+# Runtime content you drop in locally (your plugin bundle / tenant config / secrets).
+config/*
+plugins/*
+secrets/*
+!**/.gitkeep
