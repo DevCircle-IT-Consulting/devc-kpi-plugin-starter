@@ -1,13 +1,32 @@
-# DevC.KPI plugin examples & template
+# DevC.KPI — reporting plugin starter kit
 
-Everything you need to build your own **DevC.KPI reporting plugin**: a minimal starter you can
-generate from, a fully worked example to learn from, the authoring docs, and the Claude Code skill
-that helps you (or an agent) write plugins.
+Build your own reports for **[DevC.KPI](https://kpi.devcircle.at/)**, the KPI reporting platform from
+**[DevCircle](https://devcircle.at/)**. This repository is the developer kit — a `dotnet new` template,
+a fully worked example, the authoring docs, and a Claude Code skill — everything you need to extend
+DevC.KPI with your own reporting plugins.
 
-A plugin is a small .NET library that adds **cubes** (aggregations) and **widgets** (charts, KPI
-tiles, tables) to the DevC.KPI reporting engine. You compile it against one public NuGet package -
-**`DevC.KPI.Reporting.Sdk`** - and the licensed engine loads your compiled DLL at runtime. You never
-need the engine source.
+**Links:** [Live product](https://kpi.devcircle.at/) · [DevC.KPI solution overview](https://devcircle.at/loesungen/devc-kpi) · [DevCircle IT Consulting](https://devcircle.at/)
+
+## About DevC.KPI
+
+> **Decide with numbers you can trust.**
+
+DevC.KPI brings the key figures from your existing systems together into clear, always-current reports
+that your whole team shares — one trustworthy version of the truth, instead of conflicting spreadsheets
+across departments. It reads the databases you already run (no re-keying), turns them into interactive
+dashboards, and lets you filter once to re-slice a whole report across every data source at a click.
+Reports are shared by link — viewers need no login — every change is versioned for a clean audit trail,
+and it's hosted in the EU, GDPR-compliant, with maintenance and support included.
+
+**Plugins are how DevC.KPI is extended** — and building them is what this repo is for. A plugin is a
+small .NET library that adds *cubes* (aggregations) and *widgets* (charts, KPI tiles, tables) for your
+own data. You compile it against one public NuGet package — **`DevC.KPI.Reporting.Sdk`** — and the
+licensed engine loads your compiled DLL at runtime. You never need the engine source.
+
+See it live at **[kpi.devcircle.at](https://kpi.devcircle.at/)**, or read the
+**[solution overview](https://devcircle.at/loesungen/devc-kpi)**.
+
+---
 
 ## What's in here
 
@@ -61,3 +80,7 @@ The `authoring-kpi-plugin` skill ships inside the `DevC.KPI.Reporting.Sdk` NuGet
 
 The projects here pin `DevC.KPI.Reporting.Sdk` **1.3.1**. Bump to the latest published version when
 you want newer contracts; older plugins keep working against their pinned version.
+
+---
+
+<sub>A product of **[DevCircle IT Consulting GmbH](https://devcircle.at/)** · [DevC.KPI](https://kpi.devcircle.at/) · [Solution overview](https://devcircle.at/loesungen/devc-kpi)</sub>

@@ -1,4 +1,4 @@
-# Agent context - DevC.KPI plugin examples
+# Agent context - DevC.KPI plugin starter kit
 
 This repo is a kit for authoring **DevC.KPI reporting plugins**. If you are helping someone write or
 extend a plugin, use the bundled skill and the docs here.
