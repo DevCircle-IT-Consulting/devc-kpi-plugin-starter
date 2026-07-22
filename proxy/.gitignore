@@ -1,0 +1,2 @@
+# Local — holds the proxy key. Never commit.
+.env

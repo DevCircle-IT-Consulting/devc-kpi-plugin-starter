@@ -1,87 +1,64 @@
-# 08 - Run the server (one box, for evaluation)
+# 08 - Set up the server
 
-To *build* a plugin you don't need a server (`dotnet test` is enough). To *see it live* you need a
-running DevC.KPI engine to deploy it into. This page stands one up on a single machine.
+To run reports you need a DevC.KPI engine. This stands up the full stack — PostgreSQL, the API, the
+Blazor client, and a TLS reverse proxy — with Docker Compose, from the [`server/`](../server) folder.
+The engine images are licence-gated: DevCircle gives you the registry host, a pull credential, and the
+image tag.
 
-> **Two honest caveats up front.**
-> 1. The engine images are **licence-gated**. DevCircle gives you the registry host, a **pull
->    credential**, and the image **tag** to run. You cannot pull them anonymously.
-> 2. This is an **evaluation** stack: it terminates TLS with a **self-signed** cert and runs the
->    containers as root for simplicity. A real deployment uses a proper certificate / your own
->    reverse proxy and runs non-root — arrange that with DevCircle. *(This quickstart hasn't been run
->    end-to-end from this repo yet — expect to tweak; the likely rough edges are TLS trust and the
->    exact admin path to create a tenant.)*
-
-Everything below happens in the [`server/`](../server) folder.
-
-## Prerequisites
-
+## 1. Prerequisites
 - Docker + Docker Compose.
-- From DevCircle: the registry host, a pull login, and the image tag.
-- `openssl` (to make the local cert) and, on the pull host, `docker login`.
+- A **TLS certificate** for the host name you'll use — TLS is required (OpenIddict refuses non-HTTPS
+  logins). Use Let's Encrypt or your CA for a public host; a self-signed cert is fine for internal use.
+- The registry login + image tag from DevCircle.
 
-## Steps
+## 2. Configure
+```bash
+cd server
+docker login kpi.devcircle.at:5000                 # credential from DevCircle
+cp .env.example .env                               # set POSTGRES_PASSWORD, KPI_IMAGE_TAG, KPI_UID/KPI_GID
+cp api/appsettings.Production.template.json    api/appsettings.Production.json
+cp client/appsettings.Production.template.json client/appsettings.Production.json
+```
+- In `api/appsettings.Production.json` set `Identity:EncryptionKey` (`openssl rand -base64 32`) — keep it
+  constant, changing it invalidates all logins. If you serve on a real host name, set the `Identity` URLs
+  there and the `ApiUrl`/`IdentityUrl` in the client file to that host (default: `https://localhost:8443`).
+- Linux: set `KPI_UID`/`KPI_GID` to `id -u` / `id -g` so the non-root containers can write the
+  bind-mounted `api/home`, `client/home`, and your config. (Docker Desktop: leave `1000`.)
 
-1. **Log in to the registry** (credential from DevCircle):
-   ```bash
-   docker login kpi.devcircle.at:5000
-   ```
-2. **Environment** — copy and fill:
-   ```bash
-   cd server
-   cp .env.example .env         # set POSTGRES_PASSWORD and KPI_IMAGE_TAG
-   ```
-3. **App config** — copy the templates and set a stable encryption key:
-   ```bash
-   cp api/appsettings.Production.template.json    api/appsettings.Production.json
-   cp client/appsettings.Production.template.json client/appsettings.Production.json
-   # in api/appsettings.Production.json set Identity:EncryptionKey to: openssl rand -base64 32
-   ```
-   The URLs default to `https://localhost:8443` — fine for local. For a real hostname, set it in both
-   files.
-4. **TLS cert** (self-signed, for localhost):
-   ```bash
-   openssl req -x509 -newkey rsa:2048 -nodes -days 825 \
-     -keyout certs/localhost.key -out certs/localhost.crt \
-     -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost"
-   ```
-5. **Start it:**
-   ```bash
-   docker compose up -d
-   docker compose logs -f api      # watch it migrate + seed the database
-   ```
-6. **Open** `https://localhost:8443` and accept the self-signed-certificate warning. Log in with the
-   seeded admin (`admin@devcircle.at` / `DevCircleIsThe1Admin!`) and **change that password immediately**.
+## 3. Certificate
+Place your cert + key at `certs/localhost.crt` and `certs/localhost.key` (the names `nginx.conf` expects;
+change `server_name` there for a real host). A self-signed cert for internal use:
+```bash
+openssl req -x509 -newkey rsa:2048 -nodes -days 825 \
+  -keyout certs/localhost.key -out certs/localhost.crt \
+  -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost"
+```
 
-You should see the built-in **Demo / Weather** reports — they're baked into the image, so a fresh
-server is never empty. That confirms the stack works.
+## 4. Start
+```bash
+docker compose up -d
+docker compose logs -f api        # migrates + seeds the database on first start
+```
+Open `https://localhost:8443`, log in as the seeded admin (`admin@devcircle.at` /
+`DevCircleIsThe1Admin!`), and **change that password immediately**. The built-in Demo/Weather reports
+confirm the stack is up.
 
-## Create your tenant
+## 5. Create your tenant
+A plugin binds to a tenant by exact name (`config/<tenant>/` + `ForTenants("<tenant>")`). Create that
+tenant in the admin area before deploying a plugin. *(Not sure where in the UI? Ask DevCircle — it's part
+of onboarding.)*
 
-Your plugin binds to a **tenant** by exact name (`config/<tenant>/` + `ForTenants("<tenant>")`). Before
-deploying a plugin, create that tenant in the running engine's **admin area** (name it e.g. `scouts`) so
-the name exists. *(If you can't find where to create tenants in the UI, ask DevCircle — tenant
-provisioning is part of onboarding, and the exact path may differ by version.)*
+## 6. Deploy a plugin
+Build a bundle (`deploy/build-bundle.sh <Plugin> <tenant>`, see [05](05-build-and-deploy.md)), drop it in,
+restart:
+```bash
+cp -r dist/bundles/<Plugin>/plugins/<Plugin>  server/plugins/
+cp -r dist/bundles/<Plugin>/config/<tenant>   server/config/
+docker compose restart api
+docker compose logs api | grep "Reporting plugin"   # confirms it loaded
+```
+Report/YAML changes hot-reload; a new plugin DLL needs the `restart api`.
 
-## Deploy your plugin into this server
-
-1. Build a bundle from your plugin repo: `deploy/build-bundle.sh <Plugin> <tenant>` (see
-   [05-build-and-deploy.md](05-build-and-deploy.md)).
-2. Copy it into this stack's volumes and restart the API:
-   ```bash
-   cp -r dist/bundles/<Plugin>/plugins/<Plugin>  <path-to>/server/plugins/
-   cp -r dist/bundles/<Plugin>/config/<tenant>   <path-to>/server/config/
-   docker compose restart api
-   ```
-3. Confirm it loaded:
-   ```bash
-   docker compose logs api | grep "Reporting plugin"
-   ```
-   Grant the new report to your users, and it appears. Report/YAML changes hot-reload; a new **plugin
-   DLL** needs the `restart api`.
-
-## Going beyond evaluation
-
-For a real deployment (proper TLS, a public hostname, non-root containers, backups, the private-registry
-pull model), that's a DevCircle-assisted install — this folder is the local starting point, not the
-production runbook.
+## Backups
+The database is the Docker volume `kpi-pgdata`; back it up with `pg_dump` (or DevCircle's backup script).
+`api/home` holds the signing keys — keep it too, or logins reset on restore.

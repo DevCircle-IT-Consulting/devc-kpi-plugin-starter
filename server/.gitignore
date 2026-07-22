@@ -5,8 +5,10 @@ client/appsettings.Production.json
 certs/*.crt
 certs/*.key
 
-# Runtime content you drop in locally (your plugin bundle / tenant config / secrets).
+# Runtime + persisted content (your plugin bundle / tenant config / secrets / signing keys).
 config/*
 plugins/*
 secrets/*
+api/home/*
+client/home/*
 !**/.gitkeep

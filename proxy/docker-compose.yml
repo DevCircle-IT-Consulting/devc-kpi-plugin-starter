@@ -1,0 +1,22 @@
+# Run the DevC.KPI on-prem proxy next to a database you want to report on (e.g. another app stack's
+# Postgres/SQL Server container). It dials OUT to your KPI engine's relay and answers the engine's
+# queries against a DB reachable on the network it joins — nothing inbound is exposed. See docs/09.
+#
+#   cp .env.example .env   # fill in, then:  docker compose up -d
+services:
+  proxy:
+    image: ${KPI_IMAGE}/proxy:${KPI_IMAGE_TAG}
+    restart: unless-stopped
+    environment:
+      # Which KPI engine to connect to, this proxy's id (must match the engine's proxies.yaml), and its key.
+      Proxy__Connections__0__Url:     ${KPI_ENGINE_URL}
+      Proxy__Connections__0__ProxyId: ${PROXY_ID}
+      Proxy__Connections__0__Key:     ${PROXY_KEY}
+    networks:
+      - appstack
+networks:
+  # The Docker network of the app stack whose database you're reporting on, so the proxy can resolve the
+  # DB by its container/service name. Find it with `docker network ls` (usually "<project>_default").
+  appstack:
+    external: true
+    name: ${APPSTACK_NETWORK}
