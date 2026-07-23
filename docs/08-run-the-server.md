@@ -24,6 +24,16 @@ cp client/appsettings.Production.template.json client/appsettings.Production.jso
   there and the `ApiUrl`/`IdentityUrl` in the client file to that host (default: `https://localhost:8443`).
 - Linux: set `KPI_UID`/`KPI_GID` to `id -u` / `id -g` so the non-root containers can write the
   bind-mounted `api/home`, `client/home`, and your config. (Docker Desktop: leave `1000`.)
+- **Admin account**: by default the first run shows a one-time setup wizard where you pick the initial
+  admin email + password (see step 4). To skip it for an automated install, set the initial admin via
+  environment (in the `api` service of `docker-compose.yml`, or the `.env`):
+  ```
+  Seed__AdminEmail=admin@example.com
+  Seed__AdminPassword=<a strong password>
+  Seed__IncludeDemoLogin=false     # true also creates the public read-only demo login
+  ```
+  These are honoured only while the app is uninitialised (no admin yet); once an admin exists they are
+  ignored.
 
 ## 3. Certificate
 Place your cert + key at `certs/localhost.crt` and `certs/localhost.key` (the names `nginx.conf` expects;
@@ -39,9 +49,13 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 825 \
 docker compose up -d
 docker compose logs -f api        # migrates + seeds the database on first start
 ```
-Open `https://localhost:8443`, log in as the seeded admin (`admin@devcircle.at` /
-`DevCircleIsThe1Admin!`), and **change that password immediately**. The built-in Demo/Weather reports
-confirm the stack is up.
+Open `https://localhost:8443`. On a fresh database the app is **uninitialised** and shows a one-time
+**setup wizard** — enter the initial admin email + password (and optionally tick "create the public demo
+login"), submit, then log in with those credentials. The wizard is reachable only until an admin exists;
+afterwards it refuses. The built-in Demo/Weather reports confirm the stack is up.
+
+*(If you set `Seed__AdminEmail`/`Seed__AdminPassword` in step 2, the admin is created automatically and
+the wizard is skipped — just log in.)*
 
 ## 5. Create your tenant
 A plugin binds to a tenant by exact name (`config/<tenant>/` + `ForTenants("<tenant>")`). Create that
