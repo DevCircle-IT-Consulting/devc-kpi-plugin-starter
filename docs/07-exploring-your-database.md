@@ -62,10 +62,13 @@ way (through your engine + proxy); only the URL differs from DevCircle's own ins
 The probe is a **pre-compiled, self-contained CLI** - one download per OS, no .NET SDK and no source
 needed (about 37 MB), served by a running engine from `/downloads/` (alongside the on-prem proxy).
 
-> **Download it from the engine's WEB host - not the API host.** The binaries are served by the
-> Blazor/web front-end, which on a split deployment is a *different* host than the API (e.g.
-> `kpi.example.com` vs `kpi-api.example.com`; on a single-host setup they're the same). Hitting the API
-> host returns `404`.
+> **Download from where you open the KPI web app in your browser — the web front-end, at `/downloads/`
+> (the web root, never under `/api`).** Which URL that is depends on the deployment:
+> - **Single DNS** (the API lives under `/api` on the same host): `https://<host>/downloads/…`.
+> - **Two DNS** (the API has its own name at the root): the **web** name, `https://<web-host>/downloads/…`
+>   — not the API name.
+>
+> Fetching `/downloads/` from under the API path, or from the API's own hostname, returns `404`.
 
 ```bash
 # Linux - replace the host with your engine's WEB host
@@ -80,12 +83,15 @@ Diagnosing a `404`: if the proxy download (`…/downloads/DevC.KPI.Proxy-linux-x
 engine (**do not build the probe from source**). You can also grab it from DevCircle's public instance
 once that is on a current build.
 
-Run it against your engine. Here `--url` is the **API** base (`…/api`) — which may differ from the web
-host you downloaded from. It needs an Admin/TenantAdmin token and an open dev-access window on that engine:
+Run it against your engine. `--url` is the **API base** — exactly the value your client uses as `ApiUrl`
+(in `client/appsettings.Production.json`): `https://<host>/api` on a single-DNS install, or the API's own
+root name (e.g. `https://api.yourco.example`) on a two-DNS install. It needs an Admin/TenantAdmin token
+and an open dev-access window on that engine:
 
 ```bash
-./DevC.KPI.ProxyProbe-linux-x64 schema  --url https://kpi-api.yourco.example/api --tenant yourco --ds bmd
-./DevC.KPI.ProxyProbe-linux-x64 profile --url https://kpi-api.yourco.example/api --tenant yourco --ds bmd --table invoices
+# single-DNS example (API under /api); for two-DNS use the API's own root name with no /api
+./DevC.KPI.ProxyProbe-linux-x64 schema  --url https://kpi.yourco.example/api --tenant yourco --ds bmd
+./DevC.KPI.ProxyProbe-linux-x64 profile --url https://kpi.yourco.example/api --tenant yourco --ds bmd --table invoices
 ```
 
 > **A datasource must already exist to probe** — `--ds <id>` names one. If the source DB has a proxy + a

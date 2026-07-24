@@ -48,15 +48,16 @@ If the task is "explore / understand the source DB", use the **ProxyProbe** — 
 (schema / profile / validate; it **never returns a row value**). See `docs/07`. What a fresh session
 gets wrong:
 
-- **Download the probe from the WEB (client) host — NOT the API host — and do NOT build it from source.**
-  Both binaries are served at `https://<web-host>/downloads/`: `DevC.KPI.ProxyProbe-win-x64.exe` /
-  `-linux-x64` (and the proxy, `DevC.KPI.Proxy-*`). On a split install the web host differs from the API
-  host (e.g. `kpi.example.com` vs `kpi-api.example.com`). Diagnosing a `404`:
-  - 404 for everything under `/downloads/` → you're on the API host; use the web host.
-  - `DevC.KPI.Proxy-*` downloads but `DevC.KPI.ProxyProbe-*` 404s → the engine image predates the probe
-    download; ask the operator to update the engine (do not compile it yourself).
-- The probe's `--url` is the **API** base (`https://<api-host>/api`). Auth: an Admin/TenantAdmin bearer
-  token (`--token`) or a relay key.
+- **Download the probe from where you open the web app (the web front-end), at `/downloads/` — the web
+  root, never under `/api` — and do NOT build it from source.** Two deployments: **single DNS** (API
+  under `/api`) → `https://<host>/downloads/DevC.KPI.ProxyProbe-<win-x64.exe|linux-x64>`; **two DNS** (API
+  on its own root name) → the **web** name `https://<web-host>/downloads/…`, not the API name. Diagnosing
+  a `404`: everything under `/downloads/` 404s → you're on the API path/host, use the web root; the
+  `DevC.KPI.Proxy-*` binary downloads but `ProxyProbe-*` 404s → the engine predates the probe download,
+  ask the operator to update it.
+- The probe's `--url` is the **API base** — the same value the client uses as `ApiUrl`: `https://<host>/api`
+  (single DNS) or the API's own root name (two DNS). Auth: an Admin/TenantAdmin bearer token (`--token`)
+  or a relay key.
 - **A datasource must already exist to probe** (`--ds <id>`). If only a proxy + a DB secret exist but no
   datasource yet, first create a minimal `config/<tenant>/datasources/<id>.yaml` that binds `proxy:` +
   `secret:` (no cube needed), get it deployed, then probe that `--ds`.
