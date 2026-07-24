@@ -18,9 +18,10 @@ updates.
 > with **no admin bypass** — even an Admin sees nothing until granted. If someone logs in to an empty
 > report list, that's expected: go grant rights ([doc 11](11-users-and-report-rights.md)).
 
-And for onboarding anyone: **email must be configured** (SMTP or Microsoft Graph — see
-[08 §Configure](08-run-the-server.md)). User invitations and password resets are delivered *only* by
-email; there is no in-app "copy invite link". Configure mail before you create users.
+For onboarding: **configuring email** (SMTP or Microsoft Graph — see
+[08 §Configure](08-run-the-server.md)) is the smooth path — invitations and password resets are then
+emailed automatically. It's **not required**, though: without a mail sender the app shows the one-time
+set-password link on screen for you to send to the user by hand ([11](11-users-and-report-rights.md)).
 
 ## Roles
 

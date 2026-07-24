@@ -4,13 +4,13 @@ Who can do this: **Admin** or **TenantAdmin**. Users are managed at **`/person`*
 entry); a TenantAdmin manages a specific tenant's users from **Tenants → a tenant → Users**
 ([14](14-tenants-and-admin-tools.md)).
 
-## Prerequisite: email must work
+## Email (recommended, not required)
 
-Creating a user sends them an **invitation email** with a set-your-password link — that is the *only*
-way the login is activated. **The link is never shown in the UI.** So before creating users, configure
-a mail sender (SMTP `Email` or `MSGraphMail`) in `api/appsettings.Production.json` and restart the API
-([08 §Configure](08-run-the-server.md)). Same applies to password resets. Without mail, an invited user
-can never set a password.
+Creating a user produces a one-time **set-password link**. With a mail sender configured (SMTP `Email`
+or `MSGraphMail` — see [08 §Configure](08-run-the-server.md)), it's emailed to the user automatically as
+an invitation. **Without** a mail sender, onboarding still works: the app shows the link on screen right
+after you save, so you copy it and pass it to the user through your own channel. Password resets behave
+the same way. Configuring email is smoother, but it is no longer a hard prerequisite.
 
 ## Create a user
 
@@ -20,8 +20,9 @@ can never set a password.
    - **Email** — this is also the **login username**. (It becomes read-only once the login exists.)
    - **Role** — **Admin** or **User**. (TenantAdmin is not offered here — see [10](10-operating-overview.md).)
 3. On the **Reports** tab, tick the reports this user may see (you can also do this later — see below).
-4. **Save.** The user is created and an **invitation email** is sent to their address with a link to set
-   their password. They click it, choose a password, and can sign in.
+4. **Save.** The user is created. If email is configured, an **invitation** with a set-password link is
+   emailed to them. If not, a dialog shows that link — **copy it and send it to the user** yourself.
+   Either way, they open the link, choose a password, and can sign in.
 
 The user list shows a **password** indicator per row — filled once the person has completed the
 invitation (set a password). Empty means the invite is still outstanding.
@@ -42,8 +43,9 @@ If a user reports "I can't see any reports", this is almost always the answer: t
 
 ## Reset a password / re-send an invitation
 
-- **Admin-initiated:** open the user in the editor → **Reset password** — re-sends the set-password
-  email (use this if the original invitation link expired).
+- **Admin-initiated:** open the user in the editor → **Reset password** — emails a fresh set-password
+  link (or, if email isn't configured, shows it on screen for you to copy). Use this if the original link
+  expired.
 - **Self-service:** the login page's **Forgot password?** link — the user enters their email and gets a
   reset link. (Also requires mail to be configured.)
 
