@@ -27,7 +27,7 @@ Replace every `<…>` and pick one of the `|`-separated options. Delete this lin
 
 ## Access (for exploring the DB)
 
-- **Auth:** I'll paste a TenantAdmin bearer token | I'll run the probe myself | a relay key is configured
+- **Auth:** relay key set (`KPI_RELAY_KEY` — preferred; mint once with the probe's `keygen`) | I'll paste a short-lived TenantAdmin bearer token | I'll run the probe myself
 - **Dev-access window:** I'll open it (Proxies → Enable 15/30/60) | ask <who> to open it
   <!-- The safe probe verbs return 403 unless a dev-access window is open on the proxy. -->
 

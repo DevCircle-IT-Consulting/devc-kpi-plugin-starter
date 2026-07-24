@@ -116,13 +116,45 @@ export KPI_PROBE_TOKEN="<bearer>"                        # or set KPI_RELAY_KEY 
 ./tools/kpi-probe.sh profile --ds bmd --table invoices
 ```
 
-### Authentication & the dev-access window
+### Authentication
 
-- **Auth** - one of: a **TenantAdmin bearer token** (`--token`, or `KPI_PROBE_TOKEN` for the wrapper),
-  or a **relay key** your operator minted (`KPI_RELAY_KEY`). Your engine checks it.
-- **Dev-access window** - the safe verbs only work while an operator has opened a dev-access window on
-  the target proxy (Proxies view -> Enable 15/30/60 min). A closed window returns `403`. That is the
-  deliberate gate: from outside, the data stays unreadable unless someone inside opens the window.
+The probe authenticates to the engine one of two ways. **Prefer the relay key** — you mint it once and
+forget it; a bearer token has to be re-extracted from the browser every session.
+
+**Option 1 — relay key (recommended).** A long-lived credential minted once per developer. Two-secret
+model: the plaintext key stays on your box, the server stores only its SHA-256 hash.
+
+1. **Operator mints it** with the probe's `keygen` (it never talks to a DB — pure key generation):
+   ```bash
+   ./DevC.KPI.ProxyProbe-linux-x64 keygen --name alice
+   ```
+   It prints a **key** (for the dev box) and a **hash** (for the server), and reminds you where each goes.
+2. **On your (dev) box**, make the key resolvable once — the probe looks, in order, at: `--relay-key` /
+   `--relay-key-file` flags, the `KPI_RELAY_KEY` / `KPI_RELAY_KEY_FILE` env vars, a gitignored
+   `secrets/relay-key` file (found by walking up from the working dir), then `~/.devc-kpi/relay-key`.
+   Simplest: `export KPI_RELAY_KEY="<the key>"` (or drop it in `~/.devc-kpi/relay-key`) — then every
+   probe run just works, no per-session step.
+3. **On the server**, the operator adds the **hash** under `Reporting:RelayKeys:<name>` in the app-wide
+   secret file `secrets/_app.json`. A plain hash string = a **human** (all safe verbs); an object
+   `{ "hash": "<hash>", "agent": true }` = an **agent** (safe verbs only, no ad-hoc query). New secret
+   file / entry → `docker compose restart api`.
+
+**Option 2 — TenantAdmin bearer token (quick one-off).** Sign in to the web app as a TenantAdmin, copy a
+bearer token from the browser, and pass it as `--token <jwt>` (or `KPI_PROBE_TOKEN` for the wrapper).
+Nothing to set up server-side — but tokens are **short-lived**, so you re-extract one each session, which
+gets tedious for repeated exploration. Fine for a quick first look; switch to a relay key once you're
+iterating.
+
+> **Don't confuse this with the _proxy_ relay key** in [09](09-proxy-to-another-stack.md). That one
+> authenticates the **proxy's own** outbound connection to the engine (it must exist for the proxy to be
+> Connected at all). *This* one authenticates **you** running the probe. Different credentials, different
+> secret slots (`Reporting:RelayKeys:*` here vs `Reporting:Secrets:PROXY_*` there).
+
+### The dev-access window
+
+Either way, the safe verbs only work while an operator has an open **dev-access window** on the target
+proxy (Proxies view → Enable 15/30/60 min). A closed window returns `403` — the deliberate gate: from
+outside, the data stays unreadable unless someone inside opens the window.
 
 ## Summary
 
