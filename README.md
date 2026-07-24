@@ -107,8 +107,9 @@ The `authoring-kpi-plugin` skill ships inside the `DevC.KPI.Reporting.Sdk` NuGet
 
 ## SDK version
 
-The projects here pin `DevC.KPI.Reporting.Sdk` **1.3.1**. Bump to the latest published version when
-you want newer contracts; older plugins keep working against their pinned version.
+The projects here pin `DevC.KPI.Reporting.Sdk` **1.3.2**. Bump to the latest published version when
+you want newer contracts; older plugins keep working against their pinned version (the SDK's binding
+identity is fixed per major, so any `1.x` plugin loads on any `1.x` engine).
 
 ---
 
