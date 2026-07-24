@@ -130,10 +130,16 @@ model: the plaintext key stays on your box, the server stores only its SHA-256 h
    ```
    It prints a **key** (for the dev box) and a **hash** (for the server), and reminds you where each goes.
 2. **On your (dev) box**, make the key resolvable once — the probe looks, in order, at: `--relay-key` /
-   `--relay-key-file` flags, the `KPI_RELAY_KEY` / `KPI_RELAY_KEY_FILE` env vars, a gitignored
-   `secrets/relay-key` file (found by walking up from the working dir), then `~/.devc-kpi/relay-key`.
-   Simplest: `export KPI_RELAY_KEY="<the key>"` (or drop it in `~/.devc-kpi/relay-key`) — then every
-   probe run just works, no per-session step.
+   `--relay-key-file` flags, the `KPI_RELAY_KEY` / `KPI_RELAY_KEY_FILE` env vars, a `secrets/relay-key`
+   file in the repo (found by walking up from the working dir), then `~/.devc-kpi/relay-key` in your user
+   profile. Two easy, safe choices:
+   - **In the repo:** save it to `secrets/relay-key` (and keep the downloaded probe in `tools/`). The
+     generated plugin's `.gitignore` already excludes `secrets/` and the probe binary, so neither is
+     committed — and the probe auto-discovers the key when you run from the repo root. No flag needed.
+   - **In your profile:** `~/.devc-kpi/relay-key`, or `export KPI_RELAY_KEY="<the key>"` — shared across
+     repos.
+
+   Either way it's set once — no per-session step.
 3. **On the server**, the operator adds the **hash** under `Reporting:RelayKeys:<name>` in the app-wide
    secret file `secrets/_app.json`. A plain hash string = a **human** (all safe verbs); an object
    `{ "hash": "<hash>", "agent": true }` = an **agent** (safe verbs only, no ad-hoc query). New secret

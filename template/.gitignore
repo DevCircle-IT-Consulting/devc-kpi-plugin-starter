@@ -1,0 +1,26 @@
+## .NET build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+
+## Deploy bundle output (deploy/build-bundle.sh writes here)
+dist/
+
+## Secrets — datasource connection strings AND the dev-access relay key (secrets/relay-key).
+## NEVER commit these. Example templates (*.example.json) are safe and stay tracked.
+secrets/*
+!secrets/*.example.json
+
+## Downloaded self-contained CLIs (~38 MB each — re-download per docs/07; never commit).
+## Matches wherever you drop them (e.g. tools/).
+DevC.KPI.ProxyProbe-win-x64.exe
+DevC.KPI.ProxyProbe-linux-x64
+DevC.KPI.Proxy-win-x64.exe
+DevC.KPI.Proxy-linux-x64
+
+## IDE / OS
+.vs/
+.idea/
+*.suo
