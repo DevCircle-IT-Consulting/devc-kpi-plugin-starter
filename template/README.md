@@ -3,7 +3,7 @@
 The minimal DevC.KPI reporting plugin **and** the `dotnet new` template source. It registers
 **one** widget - a static "Hello, world!" text card - so it builds and loads with no database.
 Generate a fresh, renamed plugin from it instead of copying by hand (see the repo
-[README](../README.md)).
+[README](https://github.com/DevCircle-IT-Consulting/devc-kpi-plugin-starter)).
 
 ```
 template/                                   # a complete, buildable plugin repo (+ .template.config)
@@ -44,14 +44,18 @@ dotnet new devckpi-plugin -n SalesReports --tenant contoso   # decoupled plugin 
 ```
 
 `-n` sets the plugin name (`DevC.KPI.Plugins.<name>`); `--tenant` sets the engine tenant the
-plugin targets (`config/<tenant>/` + `PluginScope.ForTenants(...)`). See the repo
-[README](../README.md) and [../docs/00-getting-started.md](../docs/00-getting-started.md).
+plugin targets (`config/<tenant>/` + `PluginScope.ForTenants(...)`). See the
+[repo README](https://github.com/DevCircle-IT-Consulting/devc-kpi-plugin-starter) and
+[docs/00-getting-started.md](https://github.com/DevCircle-IT-Consulting/devc-kpi-plugin-starter/blob/main/docs/00-getting-started.md).
 
 ## Next steps
 
 - **Add data**: follow `src/.../Reference/DataExample.cs.txt` and the commented block in
   `HelloWorldPlugin.cs`, then add a datasource YAML and place the widget on a page.
-- **See a fuller example**: [../example](../example) - a real cube with sample data, a chart,
-  a KPI tile, a table, a date filter, and cube unit tests.
+- **See a fuller example**: the
+  [`example/`](https://github.com/DevCircle-IT-Consulting/devc-kpi-plugin-starter/tree/main/example) in
+  the starter repo - a real cube with sample data, a chart, a KPI tile, a table, a date filter, and cube
+  unit tests.
 
-Full walkthrough: [../docs/01-plugin-anatomy.md](../docs/01-plugin-anatomy.md).
+Full walkthrough:
+[docs/01-plugin-anatomy.md](https://github.com/DevCircle-IT-Consulting/devc-kpi-plugin-starter/blob/main/docs/01-plugin-anatomy.md).
