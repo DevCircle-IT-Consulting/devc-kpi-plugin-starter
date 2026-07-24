@@ -21,7 +21,7 @@
   "symbols": {
     "pluginName": {
       "//": "Project/namespace name derived from -n. Any character invalid in a C# identifier (e.g. the",
-      "//2": "hyphen in `ScoutManager-KPI`) becomes `_`, and that ONE safe form is used for folder names,",
+      "//2": "hyphen in `Acme-Reports`) becomes `_`, and that ONE safe form is used for folder names,",
       "//3": "file names, .slnx/csproj paths AND namespaces/classes — so a hyphenated -n still scaffolds a",
       "//4": "consistent, buildable project. (We drive the rename here instead of `sourceName` because",
       "//5": "sourceName renames files verbatim but sanitises content, which desyncs paths from folders.)",

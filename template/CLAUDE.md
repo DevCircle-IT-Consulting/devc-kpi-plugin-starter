@@ -74,9 +74,20 @@ gets wrong:
 - The probe's `--url` is the **API base** — the same value the client uses as `ApiUrl`: `https://<host>/api`
   (single DNS) or the API's own root name (two DNS). Auth: an Admin/TenantAdmin bearer token (`--token`)
   or a relay key.
-- **A datasource must already exist to probe** (`--ds <id>`). If only a proxy + a DB secret exist but no
-  datasource yet, first create a minimal `config/<tenant>/datasources/<id>.yaml` that binds `proxy:` +
-  `secret:` (no cube needed), get it deployed, then probe that `--ds`.
+- **A datasource must already exist to probe** (`--ds <id>`). No plugin DLL or real cube is needed (the
+  probe reads only the datasource's proxy + secret), **but the YAML must be valid** — the engine requires
+  `id`, `builder`, `type`, `secret`/`proxy`, and `loadWindow` even for a probe-only binding. `builder` may
+  be a placeholder cube Key (an unknown builder is only rejected when a *report* binds it). `id` is
+  explicit, not from the filename. Deploy the YAML to the server's `/srv/kpi/config/<tenant>/`, then probe:
+  ```yaml
+  id: sales
+  builder: SalesCube         # placeholder; unused for probing
+  type: postgres
+  secret: sales-db
+  proxy: acme-onprem1        # omit for a direct DB
+  freshness: { mode: cached, refresh: "0 3 * * *" }
+  loadWindow: { from: "-3Y", to: "now" }
+  ```
 - The operator must **open a dev-access window** on the proxy first, or the safe verbs return `403`.
 
 ## Deploy (self-hosted / by hand)

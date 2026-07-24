@@ -94,10 +94,25 @@ and an open dev-access window on that engine:
 ./DevC.KPI.ProxyProbe-linux-x64 profile --url https://kpi.yourco.example/api --tenant yourco --ds bmd --table invoices
 ```
 
-> **A datasource must already exist to probe** — `--ds <id>` names one. If the source DB has a proxy + a
-> secret on the server but no datasource YAML yet, first add a minimal
-> `config/<tenant>/datasources/<id>.yaml` binding `proxy:` + `secret:` (no cube needed — see
-> [03](03-datasources-and-secrets.md)), deploy it, then probe that `--ds`.
+> **A datasource must already exist to probe** — `--ds <id>` names one. **No plugin DLL or real cube is
+> needed** (the probe reads only the datasource's proxy + secret; it never runs the cube). But the YAML
+> must be *valid*: the engine requires **`id`, `builder`, `type`, a `secret` (and/or `proxy`), and a
+> `loadWindow`** even for a probe-only binding. `builder` may name the cube you'll write later — an
+> unknown builder is only rejected when a *report* binds to it, not for the datasource itself. Add
+> `config/<tenant>/datasources/<id>.yaml`, deploy it to the server's `/srv/kpi/config/<tenant>/`, then
+> probe that `--ds`:
+>
+> ```yaml
+> id: sales                  # explicit — NOT derived from the filename
+> builder: SalesCube         # placeholder cube Key; unused for probing
+> type: postgres
+> secret: sales-db           # -> Reporting:Secrets:sales-db in a server secret file
+> proxy: acme-onprem1        # omit for a directly-reachable DB
+> freshness: { mode: cached, refresh: "0 3 * * *" }
+> loadWindow: { from: "-3Y", to: "now" }
+> ```
+>
+> See [03](03-datasources-and-secrets.md).
 
 The binary is a thin HTTPS client - it holds no credentials and can only reach data through your
 engine + proxy while a dev-access window is open.

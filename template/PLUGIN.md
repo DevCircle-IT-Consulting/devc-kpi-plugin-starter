@@ -39,8 +39,9 @@ One row per source this plugin reports on (leave the example, edit the values):
 |---------------|----------|-------------|---------|---------------------------------|
 | `<id>`        | `<proxy or —>` | `<SECRET_NAME>` | postgres \| mssql \| custom | `<e.g. membership, attendance, finances, events>` |
 
-- **Datasource YAML exists on the server yet?** no — scaffold a minimal `proxy:`+`secret:` binding first |
-  yes: `<ids>`
+- **Datasource YAML exists on the server yet?** no — scaffold a minimal binding first (a valid datasource
+  needs `id` + a placeholder `builder` + `type` + `secret` + `loadWindow`; the probe reads only proxy+secret,
+  so no cube or plugin DLL is required — see `docs/07`) | yes: `<ids>`
 - `proxy` is only for a DB the engine can't reach directly (see `docs/09`); leave `—` for a direct DB.
 
 ## Deploy (how the built plugin reaches the engine)
