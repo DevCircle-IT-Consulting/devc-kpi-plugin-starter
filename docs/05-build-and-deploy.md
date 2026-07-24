@@ -74,3 +74,22 @@ Your plugin pins a specific `DevC.KPI.Reporting.Sdk` version. Bump it when you w
 rebuild and redeploy. A plugin compiled against an older SDK keeps working as long as the engine
 image is compatible - if a deploy crosses a compatibility boundary, redeploy the plugin against the
 matching SDK.
+
+## Troubleshooting: reading config errors
+
+The engine logs each tenant's config result at startup and on every hot-reload. **Check the API log
+first** — `docker compose logs api | grep -Ei "Reporting config|Reporting plugin"`. A clean load reads
+`Reporting config [<tenant>]: loaded N datasource(s), M report(s).`; problems are `WRN` lines naming the
+file and field. Common ones:
+
+| Log message / symptom | Cause | Fix |
+|---|---|---|
+| `Required value 'id' / 'builder' / 'type' / 'secret' / 'loadWindow' is missing` | The datasource YAML is incomplete — every one of these is required (even for a probe-only binding; `id` is explicit, not the filename) | Add the missing field ([03](03-datasources-and-secrets.md), [07](07-exploring-your-database.md)) |
+| `builder 'X' … no loaded plugin provides` / `Widget 'X' is not provided by any loaded plugin` | The plugin that defines it isn't deployed | Build + copy the DLL to `/srv/kpi/plugins/<id>/`, `restart api` (top of this doc) |
+| `… loaded but not enabled for this tenant — add its plugin id to plugins.yaml` | A **Shared** plugin the tenant hasn't opted into | Add its id to `config/<tenant>/plugins.yaml` ([02](02-config-reference.md)) |
+| `uses proxy 'X', which is not declared … or not scoped to this tenant` | `proxies.yaml` (server-owned) lacks the entry or its scope excludes this tenant | Add/scope the proxy in `/srv/kpi/config/proxies.yaml` ([09](09-proxy-to-another-stack.md)) |
+| No datasources/reports at all; only the demo shows | `Reporting:ConfigPath` empty → the mounted `/srv/kpi/config` isn't scanned | Set `ConfigPath` to `/srv/kpi/config` ([02](02-config-reference.md)) |
+| Plugin loaded, config clean, but a user sees **no report** | Report access is a per-user grant (no admin bypass), and a **TenantAdmin has no report list** | Grant the report (Users → Report rights) to a User/Admin in that tenant ([11](11-users-and-report-rights.md)) |
+
+*(The proxy and datasource-connection secrets live server-side; a widget/report needs the plugin DLL, but
+**probing** the DB needs only the datasource config — see [07](07-exploring-your-database.md).)*
