@@ -92,6 +92,12 @@ gets wrong:
 
 ## Deploy (self-hosted / by hand)
 
+**No report or widget appears until the plugin DLL is deployed** — cubes/widgets live in the compiled
+assembly, so config YAML alone shows nothing. (Probing the DB is the exception — it needs only the
+datasource config, not the DLL.)
+
 `bash deploy/build-bundle.sh <Plugin> <tenant>` → copy `dist/bundles/<Plugin>/plugins/<Plugin>/` to the
 server's `/srv/kpi/plugins/<Plugin>/` and `config/<tenant>/` to `/srv/kpi/config/<tenant>/`, then
-`docker compose restart api`. See `docs/05`.
+`docker compose restart api`. Confirm: `docker compose logs api | grep "Reporting plugin"` lists your
+plugin. Reports are still only *visible* to a user in that tenant who has been granted them (report
+rights); a TenantAdmin has no report list. See `docs/05`.

@@ -1,5 +1,12 @@
 # 05 - Build, test & deploy
 
+> **A plugin's cubes and widgets live in its compiled DLL — so you see *nothing* in the app until that
+> DLL is deployed.** Reports and widgets only appear once the plugin assembly is in the engine's plugins
+> volume (`/srv/kpi/plugins/<PluginId>/`) and the API has restarted; having the config YAML present is
+> not enough. Confirm with `docker compose logs api | grep "Reporting plugin"` — your plugin must be
+> listed. *(Exploring the source DB with the ProxyProbe is the exception: it needs only the datasource
+> config, not the DLL — see [07](07-exploring-your-database.md).)*
+
 ## Build & test (your whole CI)
 
 ```bash
