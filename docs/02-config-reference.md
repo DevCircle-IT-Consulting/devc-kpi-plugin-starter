@@ -83,9 +83,22 @@ groups:
 
 ## Where config comes from at deploy time
 
-Three owners, by precedence (first wins on a tenant clash):
-1. The server's `/srv/kpi/config/<tenant>/` (your plugin self-deploys its `config/<tenant>/` here).
-2. (local dev only) extra roots.
-3. The demo `default` tenant baked into the engine image.
+Three owners, by precedence (first root that has a `<tenant>/` folder wins — **whole folder, no
+merge**):
+1. The server's `/srv/kpi/config/<tenant>/` (`Reporting:ConfigPath`; your plugin self-deploys its
+   `config/<tenant>/` here). Highest precedence.
+2. (local dev only) extra roots (`Reporting:ConfigPaths`).
+3. The demo `default` tenant baked into the engine image (`config-builtin/`). Lowest precedence.
+
+> **`ConfigPath` must point at the mounted config** (`/srv/kpi/config` in the standard container). If
+> it's empty the engine falls back to a dev-only path that doesn't exist in the container, so your
+> mounted config is silently ignored and you get only the baked demo. It's set in
+> `api/appsettings.Production.json` (and/or the compose `Reporting__ConfigPath` env).
+
+> **Avoid reusing the `default` tenant name.** `default` is the baked-in Demo/Weather showcase. If you
+> name *your* tenant `default`, your `config/default/` (root 1) shadows the demo (root 3) whole-folder —
+> fine when it loads, but if that folder is ever missing the engine **silently falls back to the demo
+> `default`**, so you'd see demo reports and think yours loaded. Use a **distinct tenant name** (your
+> provisioned name, e.g. `acme`) to avoid the clash entirely.
 
 `proxies.yaml` is **server-owned** (never in your repo) - see the next page.
