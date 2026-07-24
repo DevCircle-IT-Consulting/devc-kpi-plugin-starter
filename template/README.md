@@ -48,6 +48,20 @@ plugin targets (`config/<tenant>/` + `PluginScope.ForTenants(...)`). See the
 [repo README](https://github.com/DevCircle-IT-Consulting/devc-kpi-plugin-starter) and
 [docs/00-getting-started.md](https://github.com/DevCircle-IT-Consulting/devc-kpi-plugin-starter/blob/main/docs/00-getting-started.md).
 
+## Work with Claude
+
+This repo is set up to be driven by Claude Code:
+
+1. **Fill in [`PLUGIN.md`](PLUGIN.md)** — your tenant, hosts, proxy/secret, datasources, and how you
+   deploy. It's a short fill-in-the-blanks file (no secrets) and it's what saves you from re-explaining
+   the setup every session.
+2. **Open Claude Code here and paste the kickoff prompt** from the top of `PLUGIN.md` (essentially:
+   *"Read PLUGIN.md and let's build this plugin — install the skill, then explore the database"*).
+
+Claude auto-reads [`CLAUDE.md`](CLAUDE.md) (project rules + startup procedure) and `PLUGIN.md` (your
+install profile), so it can install the authoring skill, reach your engine, and scaffold datasources
+without a round-trip of questions.
+
 ## Next steps
 
 - **Add data**: follow `src/.../Reference/DataExample.cs.txt` and the commented block in

@@ -6,6 +6,18 @@ package, **`DevC.KPI.Reporting.Sdk`**, and adds *cubes* (aggregations) and *widg
 tables) that the licensed engine loads at runtime. **You build and test it here; you never reference or
 run the engine.** `dotnet test -c Release` is the whole inner loop.
 
+## Start here: read PLUGIN.md
+
+**[`PLUGIN.md`](PLUGIN.md) is this install's profile** — hosting (self-hosted vs DevCircle-hosted),
+tenant name, DNS topology, web + API hosts, proxy/secret, the datasources, and how to deploy. **Read it
+first.** It holds the facts you'd otherwise have to ask for every session.
+
+- If it's still the unfilled template (placeholder `<…>` values), **ask the author to fill it — or fill
+  it in together** by asking only for the missing values — then proceed.
+- Once it's filled, follow it: install the skill (below) → if the DB needs exploring, get the probe from
+  the **web host** in PLUGIN.md and scaffold a minimal datasource if none exists yet (see "Exploring a
+  customer database") → build cubes/widgets → deploy per PLUGIN.md.
+
 ## Use the authoring skill
 
 There is a Claude Code skill, **`authoring-kpi-plugin`**, that knows the exact SDK surface and the
