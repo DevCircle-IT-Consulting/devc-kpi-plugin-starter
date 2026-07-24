@@ -34,7 +34,7 @@ See it live at **[kpi.devcircle.at](https://kpi.devcircle.at/)**, or read the
 |------|------------|
 | [`template/`](template) | The **minimal starter** - one static "hello world" widget. Also the `dotnet new` template source. Start new plugins here. |
 | [`example/`](example) | The **worked example** - a real cube with sample data, a line chart, a KPI tile, a table, a date filter, and unit tests. Read it to learn. |
-| [`docs/`](docs) | The authoring guide (getting started, plugin anatomy, config, datasources, widgets/charts, deploy, exploring your data, working with Claude). |
+| [`docs/`](docs) | The guide, in two tracks: **building reports** (plugin authoring) and **operating the server** (admin). See [Documentation](#documentation) below. |
 | [`tools/`](tools) | `kpi-probe.sh` - a convenience wrapper around the ProxyProbe DB-explorer CLI. |
 | [`server/`](server) | Run the DevC.KPI engine (Docker Compose + templates). See [docs/08](docs/08-run-the-server.md). |
 | [`proxy/`](proxy) | Run the on-prem proxy next to another Docker stack's database. See [docs/09](docs/09-proxy-to-another-stack.md). |
@@ -43,6 +43,29 @@ See it live at **[kpi.devcircle.at](https://kpi.devcircle.at/)**, or read the
 A Claude Code skill (`authoring-kpi-plugin`) that knows the SDK surface is **not vendored here** - it
 ships inside the `DevC.KPI.Reporting.Sdk` NuGet package (single source of truth). Install it from there;
 see [docs/06](docs/06-working-with-claude.md).
+
+## Documentation
+
+The docs come in two tracks — pick the one that matches your job.
+
+**Building reports** (plugin authors):
+[00 Getting started](docs/00-getting-started.md) ·
+[01 Plugin anatomy](docs/01-plugin-anatomy.md) ·
+[02 Config reference](docs/02-config-reference.md) ·
+[03 Datasources & secrets](docs/03-datasources-and-secrets.md) ·
+[04 Widgets & charts](docs/04-widgets-and-charts.md) ·
+[05 Build & deploy](docs/05-build-and-deploy.md) ·
+[06 Working with Claude](docs/06-working-with-claude.md) ·
+[07 Exploring your database](docs/07-exploring-your-database.md)
+
+**Operating the server** (administrators):
+[08 Run the server](docs/08-run-the-server.md) ·
+[10 Operating overview](docs/10-operating-overview.md) ·
+[11 Users & report rights](docs/11-users-and-report-rights.md) ·
+[12 Sharing reports by link](docs/12-sharing-reports.md) ·
+[13 Operations (backup/update)](docs/13-operations.md) ·
+[14 Tenants & admin tools](docs/14-tenants-and-admin-tools.md) ·
+[09 On-prem proxy](docs/09-proxy-to-another-stack.md)
 
 ## Quick start
 

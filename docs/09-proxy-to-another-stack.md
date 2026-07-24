@@ -131,9 +131,13 @@ docker compose logs -f proxy # should show it connecting to the engine's relay
 
 ## Step 4 — Put the key hash + the DB connection string on the server
 
-Add a secret file under **`server/secrets/`** (prod: `/srv/kpi/secrets/`) — any `*.json` with the shape:
+Secrets live in **`server/secrets/`** (prod: `/srv/kpi/secrets/`), one file **per tenant, named after the
+tenant** — `secrets/<tenant>.json` (e.g. `secrets/acme.json`); app-wide secrets (not tenant-specific) go
+in `secrets/_app.json`. The engine merges every `*.json` in the folder, so put a tenant's entries in
+*that tenant's* file. Add both entries to it:
 
 ```jsonc
+// server/secrets/acme.json   (the tenant that owns this proxy)
 {
   "Reporting": {
     "Secrets": {
@@ -146,14 +150,17 @@ Add a secret file under **`server/secrets/`** (prod: `/srv/kpi/secrets/`) — an
 
 - `PROXY_ACME_ONPREM1` **must match** the `secret:` you put in `proxies.yaml` (Step 1) and holds the
   **hash**, never the key.
-- `APP_DB` is the DB **connection string as the proxy sees the database** (Step "mental model"). Secret
-  names are **global** — unique across all tenants.
+- `APP_DB` is the DB **connection string as the proxy sees the database** (Step "mental model").
+- Secret **names** are **global** — unique across all tenants — even though the *file* is per-tenant.
 
-Then reload so the engine picks up the new secret:
+Then reload so the engine picks up the secret:
 
 ```bash
 docker compose restart api
 ```
+
+> A **brand-new** secret file (the tenant's first `secrets/<tenant>.json`) needs this restart — the
+> folder is scanned once at startup. **Editing an existing** secret file hot-reloads with no restart.
 
 ## Step 5 — Verify it's connected
 
