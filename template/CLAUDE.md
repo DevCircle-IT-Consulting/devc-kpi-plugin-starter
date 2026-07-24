@@ -17,6 +17,10 @@ first.** It holds the facts you'd otherwise have to ask for every session.
 - Once it's filled, follow it: install the skill (below) → if the DB needs exploring, get the probe from
   the **web host** in PLUGIN.md and scaffold a minimal datasource if none exists yet (see "Exploring a
   customer database") → build cubes/widgets → deploy per PLUGIN.md.
+- If the author opens with a greeting or a vague *"how do I start?"*, don't reply with only an
+  explanation — **begin**: read PLUGIN.md, install the skill, run `dotnet test -c Release` to confirm the
+  inner loop, then either continue per PLUGIN.md or list exactly which PLUGIN.md values / run-time inputs
+  (token, open dev-access window) you still need.
 
 ## Use the authoring skill
 
