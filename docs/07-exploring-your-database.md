@@ -60,25 +60,38 @@ way (through your engine + proxy); only the URL differs from DevCircle's own ins
 ### Getting the probe
 
 The probe is a **pre-compiled, self-contained CLI** - one download per OS, no .NET SDK and no source
-needed (about 37 MB). Every KPI engine serves it from `/downloads/`, alongside the on-prem proxy, so
-you can grab it from DevCircle's public instance or from your own engine:
+needed (about 37 MB), served by a running engine from `/downloads/` (alongside the on-prem proxy).
+
+> **Download it from the engine's WEB host - not the API host.** The binaries are served by the
+> Blazor/web front-end, which on a split deployment is a *different* host than the API (e.g.
+> `kpi.example.com` vs `kpi-api.example.com`; on a single-host setup they're the same). Hitting the API
+> host returns `404`.
 
 ```bash
-# Linux
-curl -LO https://kpi.devcircle.at/downloads/DevC.KPI.ProxyProbe-linux-x64
+# Linux - replace the host with your engine's WEB host
+curl -LO https://kpi.yourco.example/downloads/DevC.KPI.ProxyProbe-linux-x64
 chmod +x DevC.KPI.ProxyProbe-linux-x64
 
-# Windows: download https://kpi.devcircle.at/downloads/DevC.KPI.ProxyProbe-win-x64.exe
+# Windows: download https://kpi.yourco.example/downloads/DevC.KPI.ProxyProbe-win-x64.exe
 ```
 
-(From your own install, replace the host with your engine, e.g. `https://kpi.yourco.example/downloads/...`.)
+Diagnosing a `404`: if the proxy download (`…/downloads/DevC.KPI.Proxy-linux-x64`) works but the
+`ProxyProbe` one 404s, the engine image predates the probe download - ask the operator to update the
+engine (**do not build the probe from source**). You can also grab it from DevCircle's public instance
+once that is on a current build.
 
-Run it against your engine (needs an Admin/TenantAdmin token and an open dev-access window on that engine):
+Run it against your engine. Here `--url` is the **API** base (`…/api`) — which may differ from the web
+host you downloaded from. It needs an Admin/TenantAdmin token and an open dev-access window on that engine:
 
 ```bash
-./DevC.KPI.ProxyProbe-linux-x64 schema  --url https://kpi.yourco.example/api --tenant yourco --ds bmd
-./DevC.KPI.ProxyProbe-linux-x64 profile --url https://kpi.yourco.example/api --tenant yourco --ds bmd --table invoices
+./DevC.KPI.ProxyProbe-linux-x64 schema  --url https://kpi-api.yourco.example/api --tenant yourco --ds bmd
+./DevC.KPI.ProxyProbe-linux-x64 profile --url https://kpi-api.yourco.example/api --tenant yourco --ds bmd --table invoices
 ```
+
+> **A datasource must already exist to probe** — `--ds <id>` names one. If the source DB has a proxy + a
+> secret on the server but no datasource YAML yet, first add a minimal
+> `config/<tenant>/datasources/<id>.yaml` binding `proxy:` + `secret:` (no cube needed — see
+> [03](03-datasources-and-secrets.md)), deploy it, then probe that `--ds`.
 
 The binary is a thin HTTPS client - it holds no credentials and can only reach data through your
 engine + proxy while a dev-access window is open.
