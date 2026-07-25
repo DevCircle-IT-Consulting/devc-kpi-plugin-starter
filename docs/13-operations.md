@@ -84,6 +84,35 @@ curl -fsk https://localhost:8443/api/api/health        # 200 once DB is reachabl
 *(The `/api/api/health` doubling is intentional — the app is mounted under `/api` behind the proxy, and
 its own health route is `/api/health`.)* `…/api/api/status` returns the running build version.
 
+## Licence
+
+Your engine needs a licence from DevCircle. Configure where it lives under `Licence:File` (the template
+already points at `/srv/kpi/licence.json`).
+
+**Activating.** A fresh installation keeps working for a grace period with no licence, so you can activate
+it at your leisure: sign in as your cross-tenant admin, open **Licence**, and either
+
+- paste the **activation key** you were sent — the engine fetches and installs its licence itself, or
+- paste the **licence file** directly, if this host has no outbound internet access.
+
+After that the engine keeps the licence current on its own; you should never have to touch it again.
+
+**If it lapses.** The licence serves on for a grace period with a warning banner first. Only after that do
+reports and share links stop — and the admin UI stays reachable throughout, so you can always install a new
+licence. Nothing is deleted, so service resumes the moment a valid licence is in place.
+
+```bash
+curl -fsk https://localhost:8443/api/api/health/licence   # licence state; 200 healthy/degraded, 503 blocked
+docker compose logs api | grep -i licence                 # what the engine decided, and why
+```
+
+The licence endpoint is deliberately **separate** from `/api/api/health`, so an expired licence never puts
+the site into maintenance mode.
+
+> The number of **datasources** your licence covers is counted as distinct secret-backed database
+> connections across the whole installation — several cubes reading one database count once. Over the cap the
+> engine keeps running and simply does not activate the surplus datasources; the Licence page names them.
+
 ## TLS & changing the host name
 
 Certificates live in `server/certs/` (referenced by `nginx.conf`; `server_name` there is the host). If
