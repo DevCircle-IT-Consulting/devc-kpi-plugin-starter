@@ -23,7 +23,10 @@ cp client/appsettings.Production.template.json client/appsettings.Production.jso
   constant, changing it invalidates all logins. If you serve on a real host name, set the `Identity` URLs
   there and the `ApiUrl`/`IdentityUrl` in the client file to that host (default: `https://localhost:8443`).
 - Linux: set `KPI_UID`/`KPI_GID` to `id -u` / `id -g` so the non-root containers can write the
-  bind-mounted `api/home`, `client/home`, and your config. (Docker Desktop: leave `1000`.)
+  bind-mounted `api/home`, `client/home`, `licence`, and your config. (Docker Desktop: leave `1000`.)
+  The `licence` directory has to be writable: the engine stores its licence there when you activate it, and
+  renews it in place. It ships empty and stays empty until you activate — see step 4 and
+  [13-operations.md](13-operations.md#licence).
 - **Admin account**: by default the first run shows a one-time setup wizard where you pick the initial
   admin email + password (see step 4). To skip it for an automated install, set the initial admin via
   environment (in the `api` service of `docker-compose.yml`, or the `.env`):

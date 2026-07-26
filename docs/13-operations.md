@@ -86,8 +86,11 @@ its own health route is `/api/health`.)* `…/api/api/status` returns the runnin
 
 ## Licence
 
-Your engine needs a licence from DevCircle. Configure where it lives under `Licence:File` (the template
-already points at `/srv/kpi/licence.json`).
+Your engine needs a licence from DevCircle. `Licence:File` is the only licence setting, and the template
+already has it right: `/srv/kpi/licence/licence.json`, inside the **writable** `./licence` bind mount from
+`docker-compose.yml`. That mount matters — the engine writes the licence there itself when you activate and
+renews it in place, so without it activation fails and anything already written would be lost the next time
+the container is recreated. Back `./licence` up alongside `./api/home`.
 
 **Activating.** A fresh installation keeps working for a grace period with no licence, so you can activate
 it at your leisure: sign in as your cross-tenant admin, open **Licence**, and either

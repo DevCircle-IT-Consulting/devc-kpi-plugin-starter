@@ -42,6 +42,12 @@ services:
       - ./plugins:/srv/kpi/plugins:ro   # drop your plugin bundle here, then `docker compose restart api`
       - ./secrets:/srv/kpi/secrets:ro   # connection strings etc. (empty is fine for the demo)
       - ./api/home:/srv/kpi/api/home
+      # Your licence. WRITABLE and persistent on purpose: activating with an activation key makes the engine
+      # fetch and write the licence itself, and it renews in place from then on. Without this mount the engine
+      # cannot activate (the rest of /srv/kpi is read-only) and anything it did write would be lost the next
+      # time the container is recreated. Start empty — a fresh install serves for a grace period so you can
+      # activate it. Back this directory up with ./api/home.
+      - ./licence:/srv/kpi/licence
 
   client:
     image: ${KPI_IMAGE}/client:${KPI_IMAGE_TAG}

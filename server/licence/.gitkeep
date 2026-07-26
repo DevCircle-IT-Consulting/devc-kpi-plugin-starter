@@ -1,0 +1,3 @@
+# Your licence lives here — the engine writes licence.json into this directory when you activate it, and
+# renews it in place afterwards. Keep the directory; it must exist before `docker compose up` so Docker does
+# not create it as root and leave the non-root container unable to write. Nothing to put here by hand.
