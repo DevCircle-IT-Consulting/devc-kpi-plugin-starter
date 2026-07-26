@@ -60,6 +60,13 @@ afterwards it refuses. The built-in Demo/Weather reports confirm the stack is up
 *(If you set `Seed__AdminEmail`/`Seed__AdminPassword` in step 2, the admin is created automatically and
 the wizard is skipped — just log in.)*
 
+Then activate your licence: open **Licence** in the admin area and paste the activation key DevCircle sent
+you. A fresh installation serves for a grace period without one, so this can wait — but do it before the
+window runs out. Keeping the licence current means the engine contacts DevCircle once a day, and
+[13-operations.md](13-operations.md#what-your-engine-sends-to-devcircle) lists exactly what it sends (in
+short: your licence id, engine version, tenant names and datasource count — never any of your data), what we
+store, and how to run with no outbound connection at all.
+
 ## 5. Create your tenant
 A plugin binds to a tenant by exact name (`config/<tenant>/` + `ForTenants("<tenant>")`). Create that
 tenant in the admin area before deploying a plugin. *(Not sure where in the UI? Ask DevCircle — it's part

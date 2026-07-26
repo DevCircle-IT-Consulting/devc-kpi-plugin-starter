@@ -116,6 +116,74 @@ the site into maintenance mode.
 > connections across the whole installation — several cubes reading one database count once. Over the cap the
 > engine keeps running and simply does not activate the surplus datasources; the Licence page names them.
 
+### What your engine sends to DevCircle
+
+Keeping the licence current means your engine talks to DevCircle, so here is exactly what crosses the wire.
+Nothing else is transmitted, and there is no other outbound connection to us anywhere in the product.
+
+**When.** Once when you activate, then once per renewal interval (24 hours by default), and whenever an
+admin presses *Renew now*. That is the whole schedule.
+
+**What it sends:**
+
+| Field | Example | Why |
+| --- | --- | --- |
+| Licence id + customer name | `lic_acme_2026`, `ACME GmbH` | Travels inside your current licence file, which is what authenticates the call |
+| Engine version | `0.9.48.0` | So support knows which build you run before you have to say |
+| Tenant names | `acme`, `acme-test` | Recorded on your licence; **never enforced** — you may run as many tenants as you like |
+| Datasource count | `7` | Your licence covers a number of datasources; this is how we see usage against it |
+| Source IP address | `203.0.113.7` | Not sent by the engine — it is simply the address the request arrives from. One licence appearing from two unrelated addresses is how we notice a copied installation |
+| Timestamp | — | "Last seen", so we can tell a switched-off deployment from a broken one |
+
+**What it never sends.** No report data. No query results. No database contents, table or column names. No
+user accounts, names, e-mail addresses or logins. No report or dashboard usage statistics. No row counts. No
+log files. Your data never leaves your server through this channel — the payload above is the complete list,
+and you can read it in the source of `LicenceRenewalService`.
+
+**Stored on our side:** the last contact (time, address, engine version, datasource count) plus a trail of the
+most recent 200 events per licence — activated, renewed, or refused with the reason. Nothing else is kept.
+
+**If you would rather send nothing at all**, that is supported: an installation with no outbound access to us
+is a documented case. We then issue your licence file by hand and you install it on the Licence page. Be aware
+of the trade — a licence file has a limited validity, so without renewal you will need a new file from us
+before the current one runs out, and reports stop if one does not arrive in time.
+
+### Was Ihre Installation an DevCircle übermittelt
+
+Damit die Lizenz gültig bleibt, nimmt Ihre Installation Kontakt zu DevCircle auf. Nachfolgend steht
+vollständig, welche Daten dabei übertragen werden. Weitere Daten werden nicht übermittelt, und es gibt im
+gesamten Produkt keine andere ausgehende Verbindung zu uns.
+
+**Wann.** Einmal bei der Aktivierung, danach einmal je Verlängerungsintervall (standardmäßig alle 24 Stunden)
+sowie immer dann, wenn eine Administratorin oder ein Administrator *Jetzt verlängern* auslöst. Mehr nicht.
+
+**Übermittelt werden:**
+
+| Feld | Beispiel | Wozu |
+| --- | --- | --- |
+| Lizenz-ID + Kundenname | `lic_acme_2026`, `ACME GmbH` | Steht in Ihrer aktuellen Lizenzdatei, die den Aufruf legitimiert |
+| Engine-Version | `0.9.48.0` | Damit der Support weiß, welchen Build Sie einsetzen, ohne nachfragen zu müssen |
+| Mandantennamen | `acme`, `acme-test` | Werden zur Lizenz vermerkt, aber **nicht durchgesetzt** — Sie dürfen beliebig viele Mandanten betreiben |
+| Anzahl der Datenquellen | `7` | Ihre Lizenz umfasst eine bestimmte Anzahl an Datenquellen; so sehen wir die Nutzung im Verhältnis dazu |
+| IP-Adresse | `203.0.113.7` | Wird nicht von der Installation gesendet, sondern ist die Absenderadresse des Aufrufs. Erscheint eine Lizenz aus zwei nicht zusammenhängenden Adressen, erkennen wir daran eine kopierte Installation |
+| Zeitstempel | — | „Zuletzt gesehen“, damit eine abgeschaltete von einer gestörten Installation unterscheidbar ist |
+
+**Nicht übermittelt werden:** keine Reportdaten, keine Abfrageergebnisse, keine Datenbankinhalte, keine
+Tabellen- oder Spaltennamen, keine Benutzerkonten, Namen, E-Mail-Adressen oder Anmeldedaten, keine Nutzungs-
+statistiken zu Reports oder Dashboards, keine Datensatzzahlen, keine Logdateien. Ihre Daten verlassen Ihren
+Server über diesen Kanal nicht — die obige Aufstellung ist vollständig und im Quellcode von
+`LicenceRenewalService` nachlesbar.
+
+**Bei uns gespeichert** werden der letzte Kontakt (Zeitpunkt, Adresse, Engine-Version, Anzahl der
+Datenquellen) sowie die jeweils letzten 200 Ereignisse je Lizenz — aktiviert, verlängert oder mit Begründung
+abgelehnt. Sonst nichts.
+
+**Wenn Sie gar nichts übermitteln möchten**, ist das vorgesehen: Eine Installation ohne ausgehende Verbindung
+zu uns ist ein dokumentierter Fall. Wir stellen die Lizenzdatei dann manuell aus, und Sie installieren sie auf
+der Lizenzseite. Beachten Sie den Kompromiss — eine Lizenzdatei hat eine begrenzte Gültigkeit; ohne
+Verlängerung benötigen Sie rechtzeitig eine neue Datei von uns, andernfalls stellt die Installation die
+Auslieferung von Reports ein.
+
 ## TLS & changing the host name
 
 Certificates live in `server/certs/` (referenced by `nginx.conf`; `server_name` there is the host). If
